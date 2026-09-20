@@ -1,0 +1,12 @@
+# Alternativa a APScheduler: cron de sistema para ejecutar el scraping diario
+# a las 8:00 (hora de Madrid) si prefieres no depender del proceso de la API.
+#
+# Instalación (como root o el usuario que ejecute la app):
+#   crontab -e
+#   # pega la línea de abajo, ajustando la ruta del proyecto
+#
+# El propio backend (app/scheduler.py) ya programa este mismo trabajo
+# automáticamente mientras el servidor FastAPI esté en marcha; usa este cron
+# solo como alternativa/backup.
+
+0 8 * * * cd /home/user/crawl4ai/apps/preciofacil/backend && venv/bin/python -m app.ingest >> /var/log/preciofacil-scrape.log 2>&1

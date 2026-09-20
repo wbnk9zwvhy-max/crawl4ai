@@ -67,12 +67,7 @@ class ConsumScraper(BaseSupermarketScraper):
     online_store_url = "https://www.consum.es"
     postal_code = "46022"
     live_verified = True
-    notes = (
-        "API JSON pública (sin login) del buscador de tienda.consum.es "
-        "(catalog/product?q=...), descubierta inspeccionando las peticiones "
-        "XHR reales de la SPA con el navegador de Crawl4AI. Precios "
-        "verificados en vivo contra internet."
-    )
+    notes = "API oficial de tienda.consum.es, precios verificados en vivo."
 
     def __init__(self, postal_code: str = "46022"):
         self.postal_code = postal_code

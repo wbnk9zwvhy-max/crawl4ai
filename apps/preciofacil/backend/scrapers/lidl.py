@@ -144,28 +144,9 @@ class LidlScraper(BaseSupermarketScraper):
     online_store_url = "https://www.lidl.es"
     live_verified = True
     notes = (
-        "www.lidl.es es el catalogo NO-FOOD de Lidl (no hay reparto de "
-        "supermercado a domicilio en España); no existe API JSON de "
-        "catalogo de alimentacion ni paginas de categoria de comestibles "
-        "navegables. Se usan los resultados reales de "
-        "https://www.lidl.es/q/search?q=<termino> (renderizado en "
-        "servidor, HTML obtenido con AsyncWebCrawler/Playwright de "
-        "Crawl4AI porque la estrategia HTTP ligera de Crawl4AI, basada en "
-        "aiohttp, falla con la cabecera Content-Security-Policy de Lidl "
-        "de mas de 8KB) y se extrae el payload JSON SSR embebido "
-        "(__NUXT_DATA__). Solo se conservan como productos reales los "
-        "resultados cuya categoria interna de Lidl es 'Food' o 'F+V' y que "
-        "tienen informacion de formato/peso (packaging), lo que descarta "
-        "ruido como articulos de catalogo no alimentario, mas un filtro por "
-        "nombre para descartar cosmetica/higiene mal etiquetada como 'Food' "
-        "en los datos de Lidl (caso real detectado: 'Agua micelar' con "
-        "categoria Food y packaging '400 ml', descartado por nombre). La "
-        "cobertura es "
-        "parcial e irregular porque el buscador de Lidl no hace matching "
-        "literal del termino (es semantico/cross-sell), asi que algunas "
-        "categorias canonicas (p.ej. leche, aceite de oliva) pueden no "
-        "devolver ningun resultado en una ejecucion dada; lo que se "
-        "devuelve son precios reales verificados en vivo, no inventados."
+        "lidl.es no es una tienda de comestibles con reparto a domicilio, "
+        "así que solo tiene catálogo online real para algunos productos "
+        "concretos (cobertura parcial, precios verificados en vivo)."
     )
 
     def __init__(self, postal_code: str = "46022"):

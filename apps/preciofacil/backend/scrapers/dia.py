@@ -160,13 +160,7 @@ class DiaScraper(BaseSupermarketScraper):
     online_store_url = "https://www.dia.es"
     postal_code = "46022"
     live_verified = True
-    notes = (
-        "HTML server-renderizado de las páginas de categoría de dia.es, "
-        "con el JSON de productos ya embebido en <script id=vike_pageContext> "
-        "(INITIAL_STATE.l2.plp_items). No se encontró una API JSON de "
-        "catálogo aparte reutilizable por el cliente; el propio HTML "
-        "renderizado en servidor hace de 'API'. Precios verificados en vivo."
-    )
+    notes = "Páginas de categoría de dia.es, precios verificados en vivo."
 
     def __init__(self, postal_code: str = "46022"):
         self.postal_code = postal_code

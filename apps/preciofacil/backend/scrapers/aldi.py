@@ -126,23 +126,7 @@ class AldiScraper(BaseSupermarketScraper):
     color = "#00447C"
     online_store_url = "https://www.aldi.es"
     live_verified = True
-    notes = (
-        "www.aldi.es publica un catalogo de supermercado real y navegable "
-        "por categoria (https://www.aldi.es/productos/...) que, a "
-        "diferencia de Lidl, SI corresponde a los productos que se venden "
-        "en tienda (con foto, marca, formato y precio actual/anterior "
-        "reales). Cada pagina de categoria trae en su HTML "
-        "renderizado en servidor un bloque __NEXT_DATA__ con el resultado "
-        "ya resuelto de la busqueda Algolia de esa categoria completa "
-        "(hitsPerPage=1000, exhaustiveNbHits=true), asi que una sola "
-        "peticion HTTP por categoria basta para tener el listado completo, "
-        "sin necesidad de navegador ni de credenciales de Algolia. Se "
-        "descarga con AsyncHTTPCrawlerStrategy de Crawl4AI (como "
-        "mercadona.py); a diferencia de Lidl, aldi.es no dispara el limite "
-        "de cabeceras del cliente HTTP interno de Crawl4AI. El mapeo "
-        "categoria canonica -> URL de categoria de aldi.es se hizo a mano "
-        "revisando el sitemap real de paginas del sitio."
-    )
+    notes = "Catálogo real de aldi.es, precios verificados en vivo."
 
     def __init__(self, postal_code: str = "46022"):
         # Documentado arriba: 46022 (Valencia, España peninsular) usa el

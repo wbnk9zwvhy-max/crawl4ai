@@ -7,6 +7,7 @@ services:
       - preciofacil-db:/app/data
     environment:
       - TZ=Europe/Madrid
+      - PRECIOFACIL_DB_PATH=/app/data/preciofacil.db
     restart: unless-stopped
 
   frontend:

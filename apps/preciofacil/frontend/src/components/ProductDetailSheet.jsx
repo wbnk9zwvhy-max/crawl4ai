@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "../api.js";
+import { useUser } from "../store.jsx";
 import ProductThumb from "./ProductThumb.jsx";
 import SupermarketBadge from "./SupermarketBadge.jsx";
 import PriceTag from "./PriceTag.jsx";
@@ -8,9 +9,11 @@ import PriceTag from "./PriceTag.jsx";
 const dateFormatter = new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "short" });
 
 export default function ProductDetailSheet({ product, categoryIcon, onClose }) {
+  const { userEmail } = useUser();
   const [current, setCurrent] = useState(product);
   const [history, setHistory] = useState(null);
   const [similar, setSimilar] = useState(null);
+  const [watchedIds, setWatchedIds] = useState([]);
 
   useEffect(() => setCurrent(product), [product]);
 
@@ -27,7 +30,19 @@ export default function ProductDetailSheet({ product, categoryIcon, onClose }) {
       .similarProducts(current.product_id)
       .then(setSimilar)
       .catch(() => setSimilar([]));
-  }, [current.product_id]);
+    api
+      .priceAlerts(userEmail)
+      .then((state) => setWatchedIds(state.watched_product_ids))
+      .catch(() => {});
+  }, [current.product_id, userEmail]);
+
+  const isWatching = watchedIds.includes(current.product_id);
+  const toggleWatch = () => {
+    const action = isWatching
+      ? api.unwatchProduct(userEmail, current.product_id)
+      : api.watchProduct(userEmail, current.product_id);
+    action.then((state) => setWatchedIds(state.watched_product_ids)).catch(() => {});
+  };
 
   const cheapestSimilarPrice = similar?.length ? Math.min(...similar.map((p) => p.price)) : null;
   const couldSave = cheapestSimilarPrice !== null && cheapestSimilarPrice < current.price;
@@ -60,7 +75,7 @@ export default function ProductDetailSheet({ product, categoryIcon, onClose }) {
               )}
             </div>
             <p className="mt-1 text-sm font-semibold text-slate-800 dark:text-slate-100">{current.name}</p>
-            <div className="mt-1">
+            <div className="mt-1 flex items-center gap-2">
               <PriceTag
                 price={current.price}
                 previousPrice={current.previous_price}
@@ -68,6 +83,18 @@ export default function ProductDetailSheet({ product, categoryIcon, onClose }) {
                 unit={current.unit}
                 unitPrice={current.unit_price}
               />
+              <button
+                onClick={toggleWatch}
+                aria-label={isWatching ? "Dejar de avisarme de este precio" : "Avisarme si baja de precio"}
+                title={isWatching ? "Dejar de avisarme de este precio" : "Avisarme si baja de precio"}
+                className={`press shrink-0 rounded-full p-1.5 text-base transition-colors ${
+                  isWatching
+                    ? "bg-amber-100 text-amber-500 dark:bg-amber-500/20"
+                    : "bg-slate-100 text-slate-300 hover:text-amber-400 dark:bg-slate-800 dark:text-slate-500"
+                }`}
+              >
+                {isWatching ? "🔔" : "🔕"}
+              </button>
             </div>
           </div>
         </div>

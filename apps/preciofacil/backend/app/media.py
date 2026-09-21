@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import uuid
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -21,6 +22,23 @@ logger = logging.getLogger(__name__)
 MEDIA_DIR = Path(__file__).resolve().parent.parent / "media"
 PRODUCTS_DIR = MEDIA_DIR / "products"
 PRODUCTS_DIR.mkdir(parents=True, exist_ok=True)
+RECEIPTS_DIR = MEDIA_DIR / "receipts"
+RECEIPTS_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def save_receipt_image(content: bytes, content_type: str | None) -> str:
+    """Guarda la foto de un ticket subida por el usuario y devuelve su ruta
+    relativa dentro de MEDIA_DIR (servible bajo /media/<ruta>)."""
+    ext = {
+        "image/jpeg": ".jpg",
+        "image/jpg": ".jpg",
+        "image/png": ".png",
+        "image/webp": ".webp",
+        "image/heic": ".heic",
+    }.get((content_type or "").lower(), ".jpg")
+    filename = f"{uuid.uuid4().hex}{ext}"
+    (RECEIPTS_DIR / filename).write_bytes(content)
+    return f"receipts/{filename}"
 
 _DEFAULT_EXT = ".jpg"
 _ALLOWED_EXT = {".jpg", ".jpeg", ".png", ".webp", ".gif"}

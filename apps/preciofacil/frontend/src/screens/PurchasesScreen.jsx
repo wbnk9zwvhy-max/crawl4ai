@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { api } from "../api.js";
+import { api, mediaUrl } from "../api.js";
 import { useUser } from "../store.jsx";
 import SupermarketBadge from "../components/SupermarketBadge.jsx";
+import ReceiptUploadCard from "../components/ReceiptUploadCard.jsx";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -76,6 +77,8 @@ export default function PurchasesScreen() {
       <p className="mb-3 text-sm text-slate-500 dark:text-slate-400">
         Registra lo que compras y aprenderemos dónde te sale más a cuenta la próxima vez.
       </p>
+
+      <ReceiptUploadCard categories={categories} supermarkets={supermarkets} onConfirmed={loadPurchases} />
 
       <form
         onSubmit={submit}
@@ -165,6 +168,16 @@ export default function PurchasesScreen() {
                   />
                 )}
                 <span className="text-xs text-slate-400">{p.purchased_at}</span>
+                {p.receipt_image_path && (
+                  <a
+                    href={mediaUrl(`/media/${p.receipt_image_path}`)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-brand-600 underline dark:text-brand-400"
+                  >
+                    ticket
+                  </a>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2">

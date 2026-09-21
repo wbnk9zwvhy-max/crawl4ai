@@ -73,6 +73,7 @@ class PurchaseOut(BaseModel):
     price: float
     quantity: float
     purchased_at: date
+    receipt_image_path: Optional[str] = None
     created_at: datetime
 
 
@@ -99,6 +100,35 @@ class PriceHistoryPointOut(BaseModel):
     is_offer: bool
 
 
+class FavoriteIn(BaseModel):
+    user_email: str
+    category_slug: str
+
+
+class PriceWatchIn(BaseModel):
+    user_email: str
+    product_id: int
+
+
+class TriggeredAlertOut(BaseModel):
+    watch_id: int
+    product_id: int
+    product_name: str
+    supermarket_slug: str
+    supermarket_name: str
+    supermarket_color: str
+    supermarket_emoji: str
+    watched_price: float
+    current_price: float
+    savings_amount: float
+    is_historic_low: bool
+
+
+class PriceAlertsStateOut(BaseModel):
+    watched_product_ids: list[int]
+    triggered: list[TriggeredAlertOut]
+
+
 class ShoppingListItemIn(BaseModel):
     user_email: str
     category_slug: str
@@ -116,6 +146,49 @@ class ShoppingListItemOut(BaseModel):
     best_price: Optional[float]
 
 
+class ReceiptDraftItemOut(BaseModel):
+    name: str
+    unit_price: float
+    quantity: float
+    category_slug: Optional[str]
+    category_label: Optional[str]
+
+
+class ReceiptDraftOut(BaseModel):
+    receipt_image_path: str
+    supermarket_slug: Optional[str]
+    supermarket_name: Optional[str]
+    purchase_date: Optional[str]
+    total: Optional[float]
+    items: list[ReceiptDraftItemOut]
+    warning: Optional[str] = None
+
+
+class ReceiptConfirmItemIn(BaseModel):
+    product_name: str
+    category_slug: str
+    price: float
+    quantity: float = 1
+
+
+class ReceiptConfirmIn(BaseModel):
+    user_email: str
+    supermarket_slug: str
+    purchased_at: date
+    receipt_image_path: Optional[str] = None
+    items: list[ReceiptConfirmItemIn]
+
+
+class SupermarketBasketTotalOut(BaseModel):
+    supermarket_slug: str
+    supermarket_name: str
+    supermarket_color: str
+    supermarket_emoji: str
+    total: float
+    items_covered: int
+    items_total: int
+
+
 class ShoppingListPlanOut(BaseModel):
     items: list[ShoppingListItemOut]
     total_optimal: float
@@ -124,3 +197,4 @@ class ShoppingListPlanOut(BaseModel):
     single_stop_total: Optional[float]
     savings_amount: Optional[float]
     savings_pct: Optional[float]
+    totals_by_supermarket: list[SupermarketBasketTotalOut] = []

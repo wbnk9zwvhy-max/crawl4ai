@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { api } from "../api.js";
 import { useUser } from "../store.jsx";
 import SupermarketBadge from "./SupermarketBadge.jsx";
+import SupermarketLogo from "./SupermarketLogo.jsx";
 
 export default function ShoppingListCard() {
   const { userEmail } = useUser();
@@ -9,6 +11,7 @@ export default function ShoppingListCard() {
   const [plan, setPlan] = useState(null);
   const [adding, setAdding] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [showChart, setShowChart] = useState(false);
 
   const load = () => {
     api.shoppingList(userEmail).then(setPlan).catch(() => {});
@@ -122,6 +125,48 @@ export default function ShoppingListCard() {
                   {c.label}
                 </button>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {plan.items.length > 1 && plan.totals_by_supermarket?.length > 0 && (
+        <div className="mt-3">
+          <button
+            onClick={() => setShowChart((v) => !v)}
+            className="press w-full rounded-xl border border-slate-200 py-2 text-xs font-semibold text-slate-500 transition-colors hover:border-brand-400 hover:text-brand-600 dark:border-slate-700 dark:text-slate-400"
+          >
+            {showChart ? "Ocultar comparativa" : "📊 Comparar cesta por supermercado"}
+          </button>
+          {showChart && (
+            <div className="mt-3">
+              <div className="h-40">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={plan.totals_by_supermarket} margin={{ top: 8, right: 8, bottom: 0, left: -24 }}>
+                    <XAxis dataKey="supermarket_name" tick={{ fontSize: 10 }} stroke="#94a3b8" />
+                    <YAxis tick={{ fontSize: 10 }} stroke="#94a3b8" tickFormatter={(v) => `${v}€`} />
+                    <Tooltip
+                      formatter={(value, _name, props) => [
+                        `${value.toFixed(2)}€ (${props.payload.items_covered}/${props.payload.items_total} productos)`,
+                        props.payload.supermarket_name,
+                      ]}
+                    />
+                    <Bar dataKey="total" radius={[6, 6, 0, 0]}>
+                      {plan.totals_by_supermarket.map((entry) => (
+                        <Cell key={entry.supermarket_slug} fill={entry.supermarket_color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {plan.totals_by_supermarket.map((t) => (
+                  <div key={t.supermarket_slug} className="flex items-center gap-1 text-[10px] text-slate-400">
+                    <SupermarketLogo slug={t.supermarket_slug} color={t.supermarket_color} emoji={t.supermarket_emoji} className="h-4 w-4" />
+                    {t.items_covered < t.items_total && <span>({t.items_covered}/{t.items_total})</span>}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

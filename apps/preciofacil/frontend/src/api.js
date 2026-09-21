@@ -59,4 +59,39 @@ export const api = {
     request(`/api/shopping-list/${id}?user_email=${encodeURIComponent(userEmail)}`, {
       method: "DELETE",
     }),
+  analyzeReceipt: async (file) => {
+    const form = new FormData();
+    form.append("file", file);
+    // Sin cabecera Content-Type manual: el navegador la fija con el
+    // boundary correcto del multipart al usar FormData.
+    const res = await fetch(`${API_URL}/api/receipts/analyze`, { method: "POST", body: form });
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      throw new Error(body?.detail || `${res.status} ${res.statusText}`);
+    }
+    return res.json();
+  },
+  confirmReceipt: (payload) =>
+    request("/api/receipts/confirm", { method: "POST", body: JSON.stringify(payload) }),
+  favorites: (userEmail) => request(`/api/favorites?user_email=${encodeURIComponent(userEmail)}`),
+  addFavorite: (userEmail, categorySlug) =>
+    request("/api/favorites", {
+      method: "POST",
+      body: JSON.stringify({ user_email: userEmail, category_slug: categorySlug }),
+    }),
+  removeFavorite: (userEmail, categorySlug) =>
+    request(`/api/favorites/${categorySlug}?user_email=${encodeURIComponent(userEmail)}`, {
+      method: "DELETE",
+    }),
+  priceAlerts: (userEmail) =>
+    request(`/api/price-alerts?user_email=${encodeURIComponent(userEmail)}`),
+  watchProduct: (userEmail, productId) =>
+    request("/api/price-alerts", {
+      method: "POST",
+      body: JSON.stringify({ user_email: userEmail, product_id: productId }),
+    }),
+  unwatchProduct: (userEmail, productId) =>
+    request(`/api/price-alerts/${productId}?user_email=${encodeURIComponent(userEmail)}`, {
+      method: "DELETE",
+    }),
 };

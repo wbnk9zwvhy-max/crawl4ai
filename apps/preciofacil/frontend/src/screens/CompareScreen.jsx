@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
+import { useUser } from "../store.jsx";
 import SupermarketBadge from "../components/SupermarketBadge.jsx";
 import PriceTag from "../components/PriceTag.jsx";
 import ProductThumb from "../components/ProductThumb.jsx";
 import ProductDetailSheet from "../components/ProductDetailSheet.jsx";
+import FavoriteStar from "../components/FavoriteStar.jsx";
 
 export default function CompareScreen() {
+  const { userEmail } = useUser();
   const [categories, setCategories] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [comparison, setComparison] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -15,7 +19,20 @@ export default function CompareScreen() {
 
   useEffect(() => {
     api.categories().then(setCategories).catch((err) => setError(err.message));
-  }, []);
+    api.favorites(userEmail).then(setFavorites).catch(() => {});
+  }, [userEmail]);
+
+  const toggleFavorite = (slug) => {
+    const isFav = favorites.includes(slug);
+    const action = isFav ? api.removeFavorite(userEmail, slug) : api.addFavorite(userEmail, slug);
+    action.then(setFavorites).catch(() => {});
+  };
+
+  const orderedCategories = [...categories].sort((a, b) => {
+    const favA = favorites.includes(a.slug) ? 0 : 1;
+    const favB = favorites.includes(b.slug) ? 0 : 1;
+    return favA - favB;
+  });
 
   const selectCategory = (slug) => {
     setSelectedCategory(slug);
@@ -35,7 +52,7 @@ export default function CompareScreen() {
       </p>
 
       <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1">
-        {categories.map((c) => (
+        {orderedCategories.map((c) => (
           <button
             key={c.slug}
             onClick={() => selectCategory(c.slug)}
@@ -47,6 +64,11 @@ export default function CompareScreen() {
           >
             <span>{c.icon}</span>
             {c.label}
+            <FavoriteStar
+              active={favorites.includes(c.slug)}
+              onToggle={() => toggleFavorite(c.slug)}
+              size="text-sm"
+            />
           </button>
         ))}
       </div>

@@ -112,6 +112,33 @@ def compute_plan(session: Session, user_email: str) -> dict:
 
     single_stop_supermarket = supermarkets.get(single_stop_slug) if single_stop_slug else None
 
+    # Total por CADA supermercado (aunque no tenga todos los productos), para
+    # el comparador de cesta completa: cuánto te costaría lo que SÍ tiene.
+    totals_by_supermarket = []
+    if priced_items:
+        for slug, supermarket in supermarkets.items():
+            if slug == "kuups":
+                continue
+            found = [
+                (i, price_matrix[i["category_slug"]].get(slug))
+                for i in priced_items
+                if price_matrix[i["category_slug"]].get(slug) is not None
+            ]
+            if not found:
+                continue
+            totals_by_supermarket.append(
+                {
+                    "supermarket_slug": slug,
+                    "supermarket_name": supermarket.name,
+                    "supermarket_color": supermarket.color,
+                    "supermarket_emoji": supermarket.logo_emoji,
+                    "total": round(sum(price for _, price in found), 2),
+                    "items_covered": len(found),
+                    "items_total": len(priced_items),
+                }
+            )
+        totals_by_supermarket.sort(key=lambda t: t["total"])
+
     return {
         "items": items_out,
         "total_optimal": total_optimal,
@@ -120,4 +147,5 @@ def compute_plan(session: Session, user_email: str) -> dict:
         "single_stop_total": single_stop_total,
         "savings_amount": savings_amount,
         "savings_pct": savings_pct,
+        "totals_by_supermarket": totals_by_supermarket,
     }

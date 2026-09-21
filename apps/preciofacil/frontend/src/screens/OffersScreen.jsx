@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
+import { useUser } from "../store.jsx";
 import SupermarketBadge from "../components/SupermarketBadge.jsx";
 import SupermarketLogo from "../components/SupermarketLogo.jsx";
 import PriceTag from "../components/PriceTag.jsx";
@@ -7,6 +8,7 @@ import ProductThumb from "../components/ProductThumb.jsx";
 import SavingsTeaser from "../components/SavingsTeaser.jsx";
 import ShoppingListCard from "../components/ShoppingListCard.jsx";
 import ProductDetailSheet from "../components/ProductDetailSheet.jsx";
+import FavoriteStar from "../components/FavoriteStar.jsx";
 
 const PERIODS = [
   { id: "today", label: "Hoy" },
@@ -14,10 +16,12 @@ const PERIODS = [
 ];
 
 export default function OffersScreen({ onNavigate }) {
+  const { userEmail } = useUser();
   const [period, setPeriod] = useState("today");
   const [supermarkets, setSupermarkets] = useState([]);
   const [activeSupermarket, setActiveSupermarket] = useState(null);
   const [groups, setGroups] = useState(null);
+  const [favorites, setFavorites] = useState([]);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -25,6 +29,16 @@ export default function OffersScreen({ onNavigate }) {
   useEffect(() => {
     api.supermarkets().then(setSupermarkets).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    api.favorites(userEmail).then(setFavorites).catch(() => {});
+  }, [userEmail]);
+
+  const toggleFavorite = (slug) => {
+    const isFav = favorites.includes(slug);
+    const action = isFav ? api.removeFavorite(userEmail, slug) : api.addFavorite(userEmail, slug);
+    action.then(setFavorites).catch(() => {});
+  };
 
   const load = () => {
     setError(null);
@@ -147,7 +161,13 @@ export default function OffersScreen({ onNavigate }) {
       )}
 
       <div className="space-y-5">
-        {groups?.map((group) => (
+        {[...(groups ?? [])]
+          .sort((a, b) => {
+            const favA = favorites.includes(a.category.slug) ? 0 : 1;
+            const favB = favorites.includes(b.category.slug) ? 0 : 1;
+            return favA - favB;
+          })
+          .map((group) => (
           <section key={group.category.slug}>
             <div className="mb-2 flex items-center gap-2">
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-lg shadow-sm ring-1 ring-slate-100 dark:bg-slate-800 dark:ring-slate-700">
@@ -156,6 +176,10 @@ export default function OffersScreen({ onNavigate }) {
               <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100">
                 {group.category.label}
               </h2>
+              <FavoriteStar
+                active={favorites.includes(group.category.slug)}
+                onToggle={() => toggleFavorite(group.category.slug)}
+              />
             </div>
             <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
               {group.products.map((p) => (

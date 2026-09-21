@@ -42,7 +42,27 @@ tostado — así que tras aclararlo se sustituyó por Día y se añadió Kuups.
   puede aparecer como equivalente a huevos frescos aunque comparta
   categoría). Ver `backend/app/product_matching.py`.
 - **Mis compras**: registra lo que compras (producto, supermercado, precio,
-  fecha).
+  fecha), a mano o **subiendo una foto del ticket**: Claude Vision
+  (`claude-opus-5`) extrae supermercado, fecha, artículos y precios del
+  ticket, propone una categoría por artículo y, tras revisar/corregir el
+  borrador, se registran todas las compras de una vez
+  (`app/receipt_analysis.py`, `app/routers/receipts.py`). Requiere
+  `ANTHROPIC_API_KEY` (o `ANTHROPIC_AUTH_TOKEN`) en el backend; sin ella el
+  endpoint devuelve un 503 explicando cómo activarlo, el resto de la app
+  sigue funcionando igual.
+- **Favoritos**: marca ⭐ tus categorías habituales en el Comparador o en
+  Ofertas de hoy para que aparezcan siempre primero.
+- **Alertas de precio**: en la ficha de cualquier producto, toca 🔔 para
+  que te avise si baja de precio o toca mínimo histórico; los avisos
+  activos aparecen destacados arriba de todo en la pestaña Ahorros. No hay
+  notificaciones push (exigiría claves VAPID y un servidor de envío
+  aparte); el seguimiento vive dentro de la app y se comprueba cada vez que
+  la abres.
+- **Comparador de cesta completa**: con más de un producto en tu lista de
+  la compra, un botón "Comparar cesta por supermercado" muestra un gráfico
+  de barras con el total de tu cesta en cada supermercado (con cuántos de
+  tus productos tiene cada uno), para decidir de un vistazo si te compensa
+  ir a uno solo.
 - **Imágenes reales de producto**: cada producto muestra su foto de
   paquete/envase real. En vez de enlazar en caliente el CDN de cada
   supermercado, el backend descarga y cachea una copia local de la imagen

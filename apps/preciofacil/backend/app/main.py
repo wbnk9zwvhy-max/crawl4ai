@@ -11,7 +11,18 @@ from sqlmodel import Session
 from .db import engine, init_db
 from .ingest import run_daily_scrape, sync_static_tables
 from .media import MEDIA_DIR
-from .routers import categories, insights, offers, products, purchases, shopping_list, supermarkets
+from .routers import (
+    categories,
+    favorites,
+    insights,
+    offers,
+    price_alerts,
+    products,
+    purchases,
+    receipts,
+    shopping_list,
+    supermarkets,
+)
 from .scheduler import start_scheduler
 
 logging.basicConfig(level=logging.INFO)
@@ -45,6 +56,9 @@ app.include_router(offers.router)
 app.include_router(purchases.router)
 app.include_router(insights.router)
 app.include_router(shopping_list.router)
+app.include_router(receipts.router)
+app.include_router(favorites.router)
+app.include_router(price_alerts.router)
 
 
 @app.get("/api/health")

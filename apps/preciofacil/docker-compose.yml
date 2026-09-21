@@ -9,6 +9,10 @@ services:
     environment:
       - TZ=Europe/Madrid
       - PRECIOFACIL_DB_PATH=/app/data/preciofacil.db
+      # Necesaria para el análisis de tickets con Claude Vision (opcional:
+      # sin ella, ese endpoint devuelve un 503 y el resto de la app sigue
+      # funcionando). Defínela en tu shell o en un .env junto a este archivo.
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
     restart: unless-stopped
 
   frontend:

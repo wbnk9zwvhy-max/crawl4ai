@@ -77,6 +77,9 @@ class Purchase(SQLModel, table=True):
     price: float
     quantity: float = 1
     purchased_at: date
+    #: ruta relativa bajo /media de la foto del ticket, si esta compra vino
+    #: de un ticket escaneado (ver app/receipt_analysis.py).
+    receipt_image_path: Optional[str] = None
     created_at: datetime = Field(default_factory=utcnow)
 
 
@@ -88,6 +91,28 @@ class ShoppingListItem(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_email: str = Field(index=True)
     category_slug: str = Field(foreign_key="category.slug", index=True)
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class Favorite(SQLModel, table=True):
+    """Categoría marcada como favorita por el usuario: sus ofertas aparecen
+    primero en la portada."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_email: str = Field(index=True)
+    category_slug: str = Field(foreign_key="category.slug", index=True)
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class PriceWatch(SQLModel, table=True):
+    """Un producto que el usuario quiere vigilar: se avisa en la app cuando
+    su precio baja del que tenía cuando se empezó a seguir, o toca mínimo
+    histórico (ver app/price_alerts.py)."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_email: str = Field(index=True)
+    product_id: int = Field(foreign_key="product.id", index=True)
+    watched_price: float
     created_at: datetime = Field(default_factory=utcnow)
 
 

@@ -20,6 +20,12 @@ tostado — así que tras aclararlo se sustituyó por Día y se añadió Kuups.
   supermercados, ordenado de más barato a más caro.
 - **Mis compras**: registra lo que compras (producto, supermercado, precio,
   fecha).
+- **Imágenes reales de producto**: cada producto muestra su foto de
+  paquete/envase real. En vez de enlazar en caliente el CDN de cada
+  supermercado, el backend descarga y cachea una copia local de la imagen
+  de cada producto la primera vez que lo ve (`app/media.py`), y la sirve
+  desde `/media/...`. 3.407 de 3.410 productos reales tienen ya su imagen
+  descargada.
 - **Ahorros**: a partir de tu historial, la app calcula si podrías haber
   ahorrado comprando esa categoría en otro supermercado y te lo dice en
   lenguaje llano ("Compraste pasta en Consum por 1.50€. En Mercadona lo

@@ -11,6 +11,7 @@ from sqlmodel import Session
 from .db import engine, init_db
 from .ingest import run_daily_scrape, sync_static_tables
 from .media import MEDIA_DIR
+from .push import notify_triggered_alerts_for_all_users
 from .routers import (
     categories,
     favorites,
@@ -19,8 +20,11 @@ from .routers import (
     price_alerts,
     products,
     purchases,
+    push as push_router,
     receipts,
+    reorder,
     shopping_list,
+    spending,
     supermarkets,
 )
 from .scheduler import start_scheduler
@@ -59,6 +63,9 @@ app.include_router(shopping_list.router)
 app.include_router(receipts.router)
 app.include_router(favorites.router)
 app.include_router(price_alerts.router)
+app.include_router(spending.router)
+app.include_router(reorder.router)
+app.include_router(push_router.router)
 
 
 @app.get("/api/health")
@@ -70,4 +77,6 @@ def health():
 async def scrape_now():
     """Lanza manualmente el mismo scraping que corre cada día a las 8:00."""
     summary = await run_daily_scrape()
+    with Session(engine) as session:
+        notify_triggered_alerts_for_all_users(session)
     return {"summary": summary}

@@ -94,4 +94,17 @@ export const api = {
     request(`/api/price-alerts/${productId}?user_email=${encodeURIComponent(userEmail)}`, {
       method: "DELETE",
     }),
+  spending: (userEmail) => request(`/api/spending?user_email=${encodeURIComponent(userEmail)}`),
+  reorderSuggestions: (userEmail) =>
+    request(`/api/reorder-suggestions?user_email=${encodeURIComponent(userEmail)}`),
+  vapidPublicKey: () => request("/api/push/vapid-public-key"),
+  subscribePush: (payload) =>
+    request("/api/push/subscribe", { method: "POST", body: JSON.stringify(payload) }),
+  unsubscribePush: (userEmail, endpoint) =>
+    request("/api/push/subscribe", {
+      method: "DELETE",
+      body: JSON.stringify({ user_email: userEmail, endpoint }),
+    }),
+  testPush: (userEmail) =>
+    request(`/api/push/test?user_email=${encodeURIComponent(userEmail)}`, { method: "POST" }),
 };

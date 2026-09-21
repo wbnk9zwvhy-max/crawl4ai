@@ -12,14 +12,22 @@ export default function ShoppingListCard() {
   const [adding, setAdding] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [showChart, setShowChart] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [dismissed, setDismissed] = useState(new Set());
 
   const load = () => {
     api.shoppingList(userEmail).then(setPlan).catch(() => {});
   };
 
+  const loadSuggestions = () => {
+    api.reorderSuggestions(userEmail).then(setSuggestions).catch(() => {});
+  };
+
   useEffect(() => {
     api.categories().then(setCategories).catch(() => {});
     load();
+    loadSuggestions();
+    setDismissed(new Set());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userEmail]);
 
@@ -32,9 +40,14 @@ export default function ShoppingListCard() {
     try {
       const updated = await api.addShoppingListItem(userEmail, slug);
       setPlan(updated);
+      setSuggestions((prev) => prev.filter((s) => s.category_slug !== slug));
     } finally {
       setAdding(false);
     }
+  };
+
+  const dismissSuggestion = (slug) => {
+    setDismissed((prev) => new Set(prev).add(slug));
   };
 
   const handleRemove = async (id) => {
@@ -103,6 +116,42 @@ export default function ShoppingListCard() {
           </div>
         ))}
       </div>
+
+      {suggestions.filter((s) => !dismissed.has(s.category_slug)).length > 0 && (
+        <div className="mt-3 space-y-1.5">
+          {suggestions
+            .filter((s) => !dismissed.has(s.category_slug))
+            .map((s) => (
+              <div
+                key={s.category_slug}
+                className="flex items-center justify-between gap-2 rounded-xl border border-dashed border-brand-300/70 bg-brand-50/60 px-2.5 py-1.5 dark:border-brand-700/60 dark:bg-brand-950/40"
+              >
+                <div className="flex min-w-0 items-center gap-1.5">
+                  <span className="text-base">{s.category_icon}</span>
+                  <span className="min-w-0 truncate text-xs text-brand-800 dark:text-brand-200">
+                    🔁 Sueles comprar <strong>{s.category_label.toLowerCase()}</strong> cada{" "}
+                    {s.avg_interval_days} días · hace {s.days_since_last}
+                  </span>
+                </div>
+                <div className="flex shrink-0 items-center gap-1">
+                  <button
+                    onClick={() => handleAdd(s.category_slug)}
+                    className="press rounded-lg bg-brand-600 px-2 py-1 text-[11px] font-bold text-white shadow-sm"
+                  >
+                    + Añadir
+                  </button>
+                  <button
+                    onClick={() => dismissSuggestion(s.category_slug)}
+                    className="press text-slate-300 transition-colors hover:text-red-500"
+                    aria-label="Descartar sugerencia"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+        </div>
+      )}
 
       {available.length > 0 && (
         <div className="relative mt-3">

@@ -2,6 +2,7 @@ const TABS = [
   { id: "offers", label: "Hoy", icon: "🔥" },
   { id: "compare", label: "Comparar", icon: "⚖️" },
   { id: "purchases", label: "Mis compras", icon: "🧾" },
+  { id: "spending", label: "Gasto", icon: "📊" },
   { id: "insights", label: "Ahorros", icon: "💡" },
   { id: "settings", label: "Ajustes", icon: "⚙️" },
 ];

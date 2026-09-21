@@ -4,12 +4,14 @@ import OffersScreen from "./screens/OffersScreen.jsx";
 import CompareScreen from "./screens/CompareScreen.jsx";
 import PurchasesScreen from "./screens/PurchasesScreen.jsx";
 import InsightsScreen from "./screens/InsightsScreen.jsx";
+import SpendingScreen from "./screens/SpendingScreen.jsx";
 import SettingsScreen from "./screens/SettingsScreen.jsx";
 
 const SCREENS = {
   offers: OffersScreen,
   compare: CompareScreen,
   purchases: PurchasesScreen,
+  spending: SpendingScreen,
   insights: InsightsScreen,
   settings: SettingsScreen,
 };
@@ -18,6 +20,7 @@ const TITLES = {
   offers: "Ofertas de hoy",
   compare: "Comparar precios",
   purchases: "Mis compras",
+  spending: "Gasto mensual",
   insights: "Tus ahorros",
   settings: "Ajustes",
 };

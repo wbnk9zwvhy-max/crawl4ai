@@ -129,6 +129,26 @@ class PriceAlertsStateOut(BaseModel):
     triggered: list[TriggeredAlertOut]
 
 
+class PushSubscriptionKeysIn(BaseModel):
+    p256dh: str
+    auth: str
+
+
+class PushSubscriptionIn(BaseModel):
+    user_email: str
+    endpoint: str
+    keys: PushSubscriptionKeysIn
+
+
+class PushUnsubscribeIn(BaseModel):
+    user_email: str
+    endpoint: str
+
+
+class VapidPublicKeyOut(BaseModel):
+    public_key: str
+
+
 class ShoppingListItemIn(BaseModel):
     user_email: str
     category_slug: str
@@ -187,6 +207,45 @@ class SupermarketBasketTotalOut(BaseModel):
     total: float
     items_covered: int
     items_total: int
+
+
+class SpendingMonthOut(BaseModel):
+    month: str
+    label: str
+    total: float
+
+
+class SpendingCategoryOut(BaseModel):
+    category_slug: str
+    category_label: str
+    category_icon: str
+    total: float
+
+
+class SpendingSupermarketOut(BaseModel):
+    supermarket_slug: str
+    supermarket_name: str
+    supermarket_color: str
+    supermarket_emoji: str
+    total: float
+
+
+class SpendingOut(BaseModel):
+    monthly: list[SpendingMonthOut]
+    by_category: list[SpendingCategoryOut]
+    by_supermarket: list[SpendingSupermarketOut]
+    total_all_time: float
+    avg_monthly: float
+    current_month_total: float
+    previous_month_total: Optional[float]
+
+
+class ReorderSuggestionOut(BaseModel):
+    category_slug: str
+    category_label: str
+    category_icon: str
+    avg_interval_days: int
+    days_since_last: int
 
 
 class ShoppingListPlanOut(BaseModel):

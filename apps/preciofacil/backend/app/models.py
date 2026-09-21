@@ -113,6 +113,25 @@ class PriceWatch(SQLModel, table=True):
     user_email: str = Field(index=True)
     product_id: int = Field(foreign_key="product.id", index=True)
     watched_price: float
+    #: último precio por el que ya se envió una notificación push para este
+    #: seguimiento, para no reenviar el mismo aviso cada vez que corre el
+    #: scraping (ver app/push.py). None si aún no se ha notificado nunca.
+    last_notified_price: Optional[float] = None
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class PushSubscription(SQLModel, table=True):
+    """Suscripción push del navegador de un usuario (Web Push API), guardada
+    para poder enviarle notificaciones de alertas de precio aunque no tenga
+    la app abierta. No hay servidor de push propio: se envía a través del
+    servicio de push del navegador (FCM, Mozilla push, etc.) usando claves
+    VAPID (ver app/push.py)."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_email: str = Field(index=True)
+    endpoint: str = Field(index=True, unique=True)
+    p256dh: str
+    auth: str
     created_at: datetime = Field(default_factory=utcnow)
 
 

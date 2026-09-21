@@ -13,6 +13,13 @@ services:
       # sin ella, ese endpoint devuelve un 503 y el resto de la app sigue
       # funcionando). Defínela en tu shell o en un .env junto a este archivo.
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      # Necesarias para las notificaciones push de alertas de precio
+      # (opcional: sin ellas, ese botón de Ajustes avisa de que no está
+      # activado y el resto de la app sigue funcionando). Genéralas con
+      # `python -m scripts.generate_vapid_keys` dentro de backend/.
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY:-}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY:-}
+      - VAPID_CLAIMS_EMAIL=${VAPID_CLAIMS_EMAIL:-mailto:preciofacil@example.com}
     restart: unless-stopped
 
   frontend:

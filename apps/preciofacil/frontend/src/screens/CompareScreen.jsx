@@ -53,10 +53,13 @@ export default function CompareScreen() {
 
       <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-1">
         {orderedCategories.map((c) => (
-          <button
+          <div
             key={c.slug}
+            role="button"
+            tabIndex={0}
             onClick={() => selectCategory(c.slug)}
-            className={`press flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold transition-all ${
+            onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && selectCategory(c.slug)}
+            className={`press flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold transition-all ${
               selectedCategory === c.slug
                 ? "border-transparent bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-md shadow-brand-700/25"
                 : "border-slate-200/70 bg-white text-slate-600 shadow-sm dark:border-slate-700/70 dark:bg-slate-900 dark:text-slate-300"
@@ -69,7 +72,7 @@ export default function CompareScreen() {
               onToggle={() => toggleFavorite(c.slug)}
               size="text-sm"
             />
-          </button>
+          </div>
         ))}
       </div>
 

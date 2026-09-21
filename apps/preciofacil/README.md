@@ -54,15 +54,30 @@ tostado — así que tras aclararlo se sustituyó por Día y se añadió Kuups.
   Ofertas de hoy para que aparezcan siempre primero.
 - **Alertas de precio**: en la ficha de cualquier producto, toca 🔔 para
   que te avise si baja de precio o toca mínimo histórico; los avisos
-  activos aparecen destacados arriba de todo en la pestaña Ahorros. No hay
-  notificaciones push (exigiría claves VAPID y un servidor de envío
-  aparte); el seguimiento vive dentro de la app y se comprueba cada vez que
-  la abres.
+  activos aparecen destacados arriba de todo en la pestaña Ahorros, y
+  además puedes recibirlos como **notificación push real** en el móvil
+  (Ajustes → Notificaciones → Activar), sin tener la app abierta: cada vez
+  que corre el scraping (diario o manual) se comprueban las alertas activas
+  y se envía un push por cada una que se ha disparado por primera vez o ha
+  bajado más desde el último aviso (`app/push.py`, Web Push/VAPID, sin
+  servidor de notificaciones propio). Requiere `VAPID_PUBLIC_KEY` /
+  `VAPID_PRIVATE_KEY` en el backend (genera un par con
+  `python -m scripts.generate_vapid_keys`); sin ellas ese botón indica que
+  no está disponible en el servidor y el resto de la app sigue igual.
 - **Comparador de cesta completa**: con más de un producto en tu lista de
   la compra, un botón "Comparar cesta por supermercado" muestra un gráfico
   de barras con el total de tu cesta en cada supermercado (con cuántos de
   tus productos tiene cada uno), para decidir de un vistazo si te compensa
   ir a uno solo.
+- **Gasto mensual**: nueva pestaña "Gasto" con cuánto has gastado cada mes
+  (y cómo cambia frente al mes anterior), desglosado por tipo de producto y
+  por supermercado, a partir de tu historial de "Mis compras"
+  (`app/spending.py`).
+- **Recompra sugerida**: si sueles comprar algo con cierta regularidad
+  (p. ej. leche cada 2 semanas) y ha pasado ya ese intervalo desde tu
+  última compra registrada, la lista de la compra te lo sugiere solo, con
+  un botón para añadirlo en un toque (`app/reorder_suggestions.py`) — es
+  una media simple sobre tus fechas de compra, no un modelo predictivo.
 - **Imágenes reales de producto**: cada producto muestra su foto de
   paquete/envase real. En vez de enlazar en caliente el CDN de cada
   supermercado, el backend descarga y cachea una copia local de la imagen
@@ -138,6 +153,37 @@ Si prefieres un cron de sistema como alternativa/backup, hay un ejemplo en
 
 Para forzar un scraping manual (por ejemplo para probar): botón
 "↻ Actualizar" en la pestaña "Hoy" de la app, o `POST /api/admin/scrape-now`.
+
+## Instalarla en tu iPhone (pruebas en tu red local)
+
+PrecioFácil es una PWA: no hay un `.ipa` que instalar, se "instala" abriendo
+su web en Safari y tocando **Compartir → Añadir a pantalla de inicio**
+(queda como un icono normal, a pantalla completa, sin barra de Safari).
+
+El problema es que Safari en iOS solo permite instalar/cachear/recibir push
+desde un origen servido por **HTTPS** — `http://192.168.1.x:5173` de tu red
+local no vale tal cual. Para probarlo en tu WiFi de casa sin comprar un
+dominio, la forma más rápida es abrir un túnel HTTPS temporal hacia tu
+`docker compose up` (o `npm run dev`) local:
+
+```bash
+# con cloudflared (no necesita cuenta):
+cloudflared tunnel --url http://localhost:5173
+
+# o con localtunnel:
+npx localtunnel --port 5173
+```
+
+Te dará una URL `https://algo-al-azar.trycloudflare.com` (o similar) que
+apunta a tu máquina. Ábrela en Safari en el iPhone (misma WiFi o incluso
+datos móviles) y desde ahí: Compartir → Añadir a pantalla de inicio.
+
+Para que las notificaciones push funcionen también en esta prueba, apunta
+`VITE_API_URL` del frontend a la misma URL pública del backend (túnel aparte
+para el puerto 8000, o expón ambos detrás del mismo túnel con un proxy) y
+configura `VAPID_PUBLIC_KEY`/`VAPID_PRIVATE_KEY` en el backend — si no,
+todo lo demás (comparar precios, lista de la compra, tickets...) funciona
+igual, solo el botón de notificaciones te avisará de que no está activado.
 
 ## Próximos pasos sugeridos
 

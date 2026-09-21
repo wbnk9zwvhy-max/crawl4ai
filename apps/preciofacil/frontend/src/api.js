@@ -29,7 +29,11 @@ async function request(path, options = {}) {
 export const api = {
   supermarkets: () => request("/api/supermarkets"),
   categories: () => request("/api/categories"),
-  offersToday: () => request("/api/offers/today"),
+  offersToday: ({ period = "today", supermarket } = {}) => {
+    const params = new URLSearchParams({ period });
+    if (supermarket) params.set("supermarket", supermarket);
+    return request(`/api/offers/today?${params.toString()}`);
+  },
   compareCategory: (slug) => request(`/api/compare/${slug}`),
   listPurchases: (userEmail) =>
     request(`/api/purchases?user_email=${encodeURIComponent(userEmail)}`),

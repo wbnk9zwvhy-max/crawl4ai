@@ -1,23 +1,36 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import SupermarketBadge from "../components/SupermarketBadge.jsx";
+import SupermarketLogo from "../components/SupermarketLogo.jsx";
 import PriceTag from "../components/PriceTag.jsx";
 import ProductThumb from "../components/ProductThumb.jsx";
 
+const PERIODS = [
+  { id: "today", label: "Hoy" },
+  { id: "week", label: "Esta semana" },
+];
+
 export default function OffersScreen() {
+  const [period, setPeriod] = useState("today");
+  const [supermarkets, setSupermarkets] = useState([]);
+  const [activeSupermarket, setActiveSupermarket] = useState(null);
   const [groups, setGroups] = useState(null);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  useEffect(() => {
+    api.supermarkets().then(setSupermarkets).catch(() => {});
+  }, []);
+
   const load = () => {
     setError(null);
     api
-      .offersToday()
+      .offersToday({ period, supermarket: activeSupermarket })
       .then(setGroups)
       .catch((err) => setError(err.message));
   };
 
-  useEffect(load, []);
+  useEffect(load, [period, activeSupermarket]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -31,12 +44,29 @@ export default function OffersScreen() {
     }
   };
 
+  const toggleSupermarket = (slug) => {
+    setActiveSupermarket((current) => (current === slug ? null : slug));
+  };
+
   return (
     <div className="px-4 pt-4">
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          Ofertas destacadas de hoy, agrupadas por producto.
-        </p>
+      {/* Selector Hoy / Esta semana */}
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <div className="flex rounded-full bg-slate-100 p-1 dark:bg-slate-800">
+          {PERIODS.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => setPeriod(p.id)}
+              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                period === p.id
+                  ? "bg-white text-brand-700 shadow dark:bg-slate-700 dark:text-brand-300"
+                  : "text-slate-500 dark:text-slate-400"
+              }`}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
         <button
           onClick={handleRefresh}
           disabled={refreshing}
@@ -45,6 +75,47 @@ export default function OffersScreen() {
           {refreshing ? "Actualizando…" : "↻ Actualizar"}
         </button>
       </div>
+
+      {/* Accesos rápidos a supermercados */}
+      <div className="-mx-4 mb-4 flex gap-3 overflow-x-auto px-4 pb-1">
+        <button
+          onClick={() => setActiveSupermarket(null)}
+          className={`flex shrink-0 flex-col items-center gap-1 rounded-2xl border px-3 py-2 text-[11px] font-semibold transition-colors ${
+            activeSupermarket === null
+              ? "border-brand-700 bg-brand-700 text-white"
+              : "border-slate-200 bg-white text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+          }`}
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-lg">
+            🛒
+          </span>
+          Todos
+        </button>
+        {supermarkets
+          .filter((s) => s.slug !== "kuups")
+          .map((s) => (
+            <button
+              key={s.slug}
+              onClick={() => toggleSupermarket(s.slug)}
+              className={`flex shrink-0 flex-col items-center gap-1 rounded-2xl border px-3 py-2 text-[11px] font-semibold transition-colors ${
+                activeSupermarket === s.slug
+                  ? "border-brand-700 bg-brand-700 text-white"
+                  : "border-slate-200 bg-white text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+              }`}
+            >
+              <SupermarketLogo slug={s.slug} color={s.color} emoji={s.logo_emoji} className="h-9 w-9" />
+              {s.name}
+            </button>
+          ))}
+      </div>
+
+      <p className="mb-3 text-sm text-slate-500 dark:text-slate-400">
+        {period === "today"
+          ? "Ofertas destacadas de hoy, agrupadas por producto."
+          : "Los mejores precios vistos esta semana, agrupados por producto."}
+        {activeSupermarket &&
+          ` Filtrado por ${supermarkets.find((s) => s.slug === activeSupermarket)?.name ?? ""}.`}
+      </p>
 
       {error && (
         <div className="mb-4 rounded-xl bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950 dark:text-red-300">
@@ -62,8 +133,8 @@ export default function OffersScreen() {
 
       {groups && groups.length === 0 && (
         <div className="mt-10 text-center text-sm text-slate-400">
-          Todavía no hay ofertas detectadas. Pulsa "Actualizar" o espera al
-          análisis automático de las 8:00.
+          Todavía no hay ofertas detectadas{activeSupermarket ? " para este supermercado" : ""}.
+          Pulsa "Actualizar" o espera al análisis automático de las 8:00.
         </div>
       )}
 

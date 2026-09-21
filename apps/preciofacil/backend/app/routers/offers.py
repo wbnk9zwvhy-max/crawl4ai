@@ -1,11 +1,19 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from datetime import datetime, timedelta, timezone
+from typing import Literal, Optional
+
+from fastapi import APIRouter, Depends, Query
 from sqlmodel import Session, select
 
 from ..db import get_session
 from ..models import Category, Supermarket
-from ..queries import category_out, latest_snapshot_per_product, to_product_price_out
+from ..queries import (
+    best_snapshot_per_product_since,
+    category_out,
+    latest_snapshot_per_product,
+    to_product_price_out,
+)
 from ..schemas import CategoryComparisonOut
 
 router = APIRouter(prefix="/api/offers", tags=["offers"])
@@ -14,14 +22,27 @@ TOP_N_PER_CATEGORY = 3
 
 
 @router.get("/today", response_model=list[CategoryComparisonOut])
-def offers_today(session: Session = Depends(get_session)):
-    """Ofertas más destacadas del día, agrupadas por categoría de producto."""
+def offers_today(
+    period: Literal["today", "week"] = "today",
+    supermarket: Optional[str] = Query(default=None),
+    session: Session = Depends(get_session),
+):
+    """Ofertas más destacadas del día o de la semana, agrupadas por
+    categoría de producto, opcionalmente filtradas a un supermercado."""
     supermarkets = {s.slug: s for s in session.exec(select(Supermarket)).all()}
     categories = session.exec(select(Category).order_by(Category.label)).all()
+    since = datetime.now(timezone.utc) - timedelta(days=7)
 
     result: list[CategoryComparisonOut] = []
     for category in categories:
-        pairs = latest_snapshot_per_product(session, category_slug=category.slug)
+        if period == "week":
+            pairs = best_snapshot_per_product_since(
+                session, since=since, category_slug=category.slug, supermarket_slug=supermarket
+            )
+        else:
+            pairs = latest_snapshot_per_product(
+                session, category_slug=category.slug, supermarket_slug=supermarket
+            )
         offers = [
             (product, snapshot)
             for product, snapshot in pairs
@@ -34,10 +55,10 @@ def offers_today(session: Session = Depends(get_session)):
 
         products_out = []
         for product, snapshot in offers:
-            supermarket = supermarkets.get(product.supermarket_slug)
-            if not supermarket:
+            sm = supermarkets.get(product.supermarket_slug)
+            if not sm:
                 continue
-            products_out.append(to_product_price_out(product, snapshot, supermarket))
+            products_out.append(to_product_price_out(product, snapshot, sm))
 
         if not products_out:
             continue

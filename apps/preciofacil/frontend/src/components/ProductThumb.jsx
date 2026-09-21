@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { mediaUrl } from "../api.js";
 
 export default function ProductThumb({ src, alt, emoji, className = "" }) {
   const [failed, setFailed] = useState(false);
@@ -9,7 +10,7 @@ export default function ProductThumb({ src, alt, emoji, className = "" }) {
     >
       {showImage ? (
         <img
-          src={src}
+          src={mediaUrl(src)}
           alt={alt}
           className="h-full w-full object-contain"
           onError={() => setFailed(true)}

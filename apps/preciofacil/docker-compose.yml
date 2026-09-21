@@ -5,6 +5,7 @@ services:
       - "8000:8000"
     volumes:
       - preciofacil-db:/app/data
+      - preciofacil-media:/app/media
     environment:
       - TZ=Europe/Madrid
       - PRECIOFACIL_DB_PATH=/app/data/preciofacil.db
@@ -23,3 +24,4 @@ services:
 
 volumes:
   preciofacil-db:
+  preciofacil-media:

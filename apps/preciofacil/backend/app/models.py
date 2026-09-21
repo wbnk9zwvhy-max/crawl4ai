@@ -37,6 +37,10 @@ class Product(SQLModel, table=True):
     name: str
     brand: Optional[str] = None
     image_url: Optional[str] = None
+    #: ruta relativa servida bajo /media una vez descargada la imagen
+    #: original del producto (ver app/media.py); None si aún no se ha
+    #: descargado o la descarga falló.
+    image_path: Optional[str] = None
     url: Optional[str] = None
     unit: Optional[str] = None
 

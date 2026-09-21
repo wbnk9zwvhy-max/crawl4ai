@@ -10,6 +10,7 @@ from scrapers.registry import REGISTRY
 from scrapers.taxonomy import CANONICAL_CATEGORIES
 
 from .db import engine
+from .media import download_product_images
 from .models import Category, PriceSnapshot, Product, Supermarket
 
 logger = logging.getLogger(__name__)
@@ -51,6 +52,7 @@ def _upsert_product(session: Session, item: ScrapedProduct) -> Product:
             name=item.name,
             brand=item.brand,
             image_url=item.image_url,
+            image_path=item.local_image_path,
             url=item.url,
             unit=item.unit,
         )
@@ -60,6 +62,7 @@ def _upsert_product(session: Session, item: ScrapedProduct) -> Product:
         product.name = item.name
         product.category_slug = item.category_slug or product.category_slug
         product.image_url = item.image_url or product.image_url
+        product.image_path = item.local_image_path or product.image_path
         product.url = item.url or product.url
         product.unit = item.unit or product.unit
     return product
@@ -109,6 +112,9 @@ async def run_daily_scrape() -> dict:
                 summary[entry.slug] = {"status": f"error: {exc}", "productos": 0}
                 continue
 
+            await download_product_images(products)
+            imagenes = sum(1 for p in products if p.local_image_path)
+
             stored = store_products(session, products)
             live = len(products) > 0
             supermarket = session.get(Supermarket, entry.slug)
@@ -122,6 +128,7 @@ async def run_daily_scrape() -> dict:
                 "status": "ok" if live else "sin_datos",
                 "productos": stored,
                 "ofertas": sum(1 for p in products if p.is_offer),
+                "imagenes": imagenes,
             }
     return summary
 

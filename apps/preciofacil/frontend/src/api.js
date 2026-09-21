@@ -3,6 +3,16 @@
 // VITE_API_URL si el backend vive en otro dominio.
 const API_URL = import.meta.env.VITE_API_URL || "";
 
+// Las imágenes de producto vienen de la API como rutas relativas
+// (/media/products/...) servidas por el propio backend. En dev el proxy de
+// Vite las resuelve igual que /api; en producción hay que anteponerles el
+// origen real del backend.
+export function mediaUrl(path) {
+  if (!path) return path;
+  if (/^https?:\/\//.test(path)) return path;
+  return `${API_URL}${path}`;
+}
+
 async function request(path, options = {}) {
   const res = await fetch(`${API_URL}${path}`, {
     headers: { "Content-Type": "application/json" },

@@ -21,6 +21,10 @@ def latest_snapshot_per_product(session: Session, category_slug: str | None = No
 
 
 def to_product_price_out(product: Product, snapshot: PriceSnapshot, supermarket: Supermarket) -> ProductPriceOut:
+    # Preferimos la copia local descargada del producto (servida bajo
+    # /media) a enlazar en caliente el CDN del supermercado: es más
+    # fiable, más rápida y no depende de que el hotlink siga permitido.
+    image_url = f"/media/{product.image_path}" if product.image_path else product.image_url
     return ProductPriceOut(
         product_id=product.id,
         supermarket_slug=supermarket.slug,
@@ -29,7 +33,7 @@ def to_product_price_out(product: Product, snapshot: PriceSnapshot, supermarket:
         supermarket_emoji=supermarket.logo_emoji,
         name=product.name,
         brand=product.brand,
-        image_url=product.image_url,
+        image_url=image_url,
         url=product.url,
         unit=product.unit,
         price=snapshot.price,

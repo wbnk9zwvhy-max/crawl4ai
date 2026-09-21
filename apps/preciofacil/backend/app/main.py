@@ -5,10 +5,12 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlmodel import Session
 
 from .db import engine, init_db
 from .ingest import run_daily_scrape, sync_static_tables
+from .media import MEDIA_DIR
 from .routers import categories, insights, offers, products, purchases, supermarkets
 from .scheduler import start_scheduler
 
@@ -32,6 +34,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/media", StaticFiles(directory=str(MEDIA_DIR)), name="media")
 
 app.include_router(supermarkets.router)
 app.include_router(categories.router)

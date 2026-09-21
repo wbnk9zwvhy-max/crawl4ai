@@ -3,6 +3,7 @@ backend/__pycache__/
 backend/**/__pycache__/
 backend/*.db
 backend/*.db-journal
+backend/media/
 frontend/node_modules/
 frontend/dist/
 frontend/dev-dist/

@@ -29,6 +29,10 @@ class ScrapedProduct:
     url: Optional[str] = None
     brand: Optional[str] = None
     image_url: Optional[str] = None
+    #: ruta relativa dentro de app/media/products una vez descargada la
+    #: imagen original del producto (ver app/media.py); la rellena el
+    #: pipeline de ingesta, no el scraper.
+    local_image_path: Optional[str] = None
     unit_price: Optional[float] = None
     unit: Optional[str] = None
     is_offer: bool = False

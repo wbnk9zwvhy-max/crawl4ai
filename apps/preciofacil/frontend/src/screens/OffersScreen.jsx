@@ -88,7 +88,7 @@ export default function OffersScreen() {
                     emoji={group.category.icon}
                     className="mb-2 h-20 w-full"
                   />
-                  <SupermarketBadge name={p.supermarket_name} color={p.supermarket_color} emoji={p.supermarket_emoji} />
+                  <SupermarketBadge slug={p.supermarket_slug} name={p.supermarket_name} color={p.supermarket_color} emoji={p.supermarket_emoji} />
                   <p className="mt-2 line-clamp-2 text-xs font-medium text-slate-700 dark:text-slate-200">
                     {p.name}
                   </p>

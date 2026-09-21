@@ -88,7 +88,7 @@ export default function CompareScreen() {
               <ProductThumb src={p.image_url} alt={p.name} emoji={comparison.category.icon} className="h-12 w-12" />
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <SupermarketBadge name={p.supermarket_name} color={p.supermarket_color} emoji={p.supermarket_emoji} />
+                  <SupermarketBadge slug={p.supermarket_slug} name={p.supermarket_name} color={p.supermarket_color} emoji={p.supermarket_emoji} />
                   {idx === 0 && (
                     <span className="rounded-full bg-brand-700 px-2 py-0.5 text-[10px] font-bold text-white">
                       MÁS BARATO

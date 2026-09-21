@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useUser } from "../store.jsx";
+import SupermarketLogo from "../components/SupermarketLogo.jsx";
 
 export default function SettingsScreen() {
   const { userEmail, setUserEmail } = useUser();
@@ -48,12 +49,12 @@ export default function SettingsScreen() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-white"
-                    style={{ backgroundColor: s.color }}
-                  >
-                    {s.logo_emoji}
-                  </span>
+                  <SupermarketLogo
+                    slug={s.slug}
+                    color={s.color}
+                    emoji={s.logo_emoji}
+                    className="h-9 w-9 border border-slate-100"
+                  />
                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     {s.name}
                   </span>

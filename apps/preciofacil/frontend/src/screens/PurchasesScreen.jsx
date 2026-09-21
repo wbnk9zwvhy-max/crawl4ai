@@ -158,6 +158,7 @@ export default function PurchasesScreen() {
               <div className="mt-1 flex items-center gap-2">
                 {smMap[p.supermarket_slug] && (
                   <SupermarketBadge
+                    slug={p.supermarket_slug}
                     name={smMap[p.supermarket_slug].name}
                     color={smMap[p.supermarket_slug].color}
                     emoji={smMap[p.supermarket_slug].logo_emoji}

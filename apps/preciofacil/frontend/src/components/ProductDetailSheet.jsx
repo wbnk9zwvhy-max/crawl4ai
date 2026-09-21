@@ -33,12 +33,15 @@ export default function ProductDetailSheet({ product, categoryIcon, onClose }) {
   const couldSave = cheapestSimilarPrice !== null && cheapestSimilarPrice < current.price;
 
   return (
-    <div className="fixed inset-0 z-30 flex items-end justify-center bg-black/40" onClick={onClose}>
+    <div
+      className="animate-fade-in fixed inset-0 z-30 flex items-end justify-center bg-slate-900/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
       <div
-        className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-t-3xl bg-white p-4 pb-8 dark:bg-slate-900"
+        className="animate-sheet-in max-h-[85vh] w-full max-w-md overflow-y-auto rounded-t-[2rem] bg-white p-4 pb-8 shadow-2xl ring-1 ring-black/5 dark:bg-slate-900"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-slate-200 dark:bg-slate-700" />
+        <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-slate-200 dark:bg-slate-700" />
 
         <div className="flex gap-3">
           <ProductThumb src={current.image_url} alt={current.name} emoji={categoryIcon} className="h-20 w-20" />
@@ -92,7 +95,7 @@ export default function ProductDetailSheet({ product, categoryIcon, onClose }) {
                 <button
                   key={p.product_id}
                   onClick={() => setCurrent(p)}
-                  className="flex w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white p-2.5 text-left dark:border-slate-800 dark:bg-slate-900"
+                  className="press flex w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white p-2.5 text-left shadow-sm transition-colors hover:border-brand-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-brand-700"
                 >
                   <div className="flex min-w-0 items-center gap-2">
                     <SupermarketBadge slug={p.supermarket_slug} name={p.supermarket_name} color={p.supermarket_color} emoji={p.supermarket_emoji} />
@@ -156,8 +159,8 @@ export default function ProductDetailSheet({ product, categoryIcon, onClose }) {
             href={current.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white"
-            style={{ backgroundColor: current.supermarket_color }}
+            className="press mt-5 flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white shadow-lg"
+            style={{ backgroundColor: current.supermarket_color, boxShadow: `0 8px 20px -6px ${current.supermarket_color}66` }}
           >
             Comprar en {current.supermarket_name} ↗
           </a>
@@ -165,7 +168,7 @@ export default function ProductDetailSheet({ product, categoryIcon, onClose }) {
 
         <button
           onClick={onClose}
-          className="mt-2 w-full rounded-xl py-2.5 text-sm font-semibold text-slate-500 dark:text-slate-400"
+          className="press mt-2 w-full rounded-xl py-2.5 text-sm font-semibold text-slate-500 transition-colors hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800"
         >
           Cerrar
         </button>

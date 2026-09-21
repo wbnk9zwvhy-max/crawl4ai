@@ -14,7 +14,7 @@ export default function SettingsScreen() {
 
   return (
     <div className="space-y-6 px-4 pt-4">
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+      <section className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm backdrop-blur-sm dark:border-slate-800/70 dark:bg-slate-900/90">
         <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400">
           Tu perfil
         </h3>
@@ -23,11 +23,11 @@ export default function SettingsScreen() {
           <input
             value={emailDraft}
             onChange={(e) => setEmailDraft(e.target.value)}
-            className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm transition-colors focus:border-brand-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
           <button
             onClick={() => setUserEmail(emailDraft)}
-            className="rounded-xl bg-brand-700 px-3 py-2 text-sm font-semibold text-white"
+            className="press rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 px-3 py-2 text-sm font-semibold text-white shadow-md shadow-brand-700/25"
           >
             Guardar
           </button>
@@ -45,22 +45,17 @@ export default function SettingsScreen() {
           {supermarkets.map((s) => (
             <div
               key={s.slug}
-              className="rounded-2xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900"
+              className="rounded-2xl border border-slate-200/70 bg-white p-3 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800/70 dark:bg-slate-900"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <SupermarketLogo
-                    slug={s.slug}
-                    color={s.color}
-                    emoji={s.logo_emoji}
-                    className="h-9 w-9 border border-slate-100"
-                  />
+                  <SupermarketLogo slug={s.slug} color={s.color} emoji={s.logo_emoji} className="h-9 w-9" />
                   <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                     {s.name}
                   </span>
                 </div>
                 {s.live_verified ? (
-                  <span className="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                  <span className="rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 px-2 py-1 text-[10px] font-bold text-white shadow-sm">
                     ✓ Precios en vivo
                   </span>
                 ) : (
@@ -77,7 +72,7 @@ export default function SettingsScreen() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 text-xs text-slate-400 dark:border-slate-800 dark:bg-slate-900">
+      <section className="rounded-2xl border border-slate-200/70 bg-white/90 p-4 text-xs text-slate-400 shadow-sm backdrop-blur-sm dark:border-slate-800/70 dark:bg-slate-900/90">
         <p>
           Los precios se analizan automáticamente cada día a las 8:00 con
           Crawl4AI. Puedes forzar una actualización manual desde la pestaña

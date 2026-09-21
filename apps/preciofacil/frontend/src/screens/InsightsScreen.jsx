@@ -25,12 +25,16 @@ export default function InsightsScreen() {
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       {insights && insights.length > 0 && (
-        <div className="mb-5 rounded-2xl bg-gradient-to-br from-brand-700 to-brand-500 p-4 text-white">
-          <p className="text-xs font-medium uppercase tracking-wide text-brand-100">
+        <div className="relative mb-5 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 via-brand-600 to-brand-800 p-4 text-white shadow-lg shadow-brand-700/25">
+          <div
+            className="pointer-events-none absolute -right-8 -top-12 h-36 w-36 rounded-full bg-white/10 blur-2xl"
+            aria-hidden="true"
+          />
+          <p className="relative text-xs font-semibold uppercase tracking-wider text-brand-100">
             Ahorro potencial detectado
           </p>
-          <p className="mt-1 text-3xl font-extrabold">{totalSavings.toFixed(2)}€</p>
-          <p className="mt-1 text-xs text-brand-100">
+          <p className="relative text-3xl font-extrabold tracking-tight">{totalSavings.toFixed(2)}€</p>
+          <p className="relative mt-1 text-xs text-brand-100">
             en {insights.length} tipo{insights.length === 1 ? "" : "s"} de producto que sueles comprar
           </p>
         </div>
@@ -47,11 +51,11 @@ export default function InsightsScreen() {
         {insights?.map((i) => (
           <div
             key={i.id}
-            className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+            className="rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-slate-800/70 dark:bg-slate-900"
           >
             <div className="flex items-start justify-between gap-3">
               <p className="text-sm text-slate-700 dark:text-slate-200">{i.message}</p>
-              <span className="shrink-0 rounded-full bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+              <span className="shrink-0 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 px-2 py-1 text-xs font-bold text-white shadow-sm">
                 +{i.savings_amount.toFixed(2)}€
               </span>
             </div>

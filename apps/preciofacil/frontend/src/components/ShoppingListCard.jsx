@@ -42,13 +42,13 @@ export default function ShoppingListCard() {
   if (!plan) return null;
 
   return (
-    <div className="mb-5 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+    <div className="mb-5 rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm backdrop-blur-sm dark:border-slate-800/70 dark:bg-slate-900/90">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100">
           🛒 Tu lista de la compra
         </h2>
         {plan.items.length > 0 && (
-          <span className="text-lg font-extrabold text-slate-900 dark:text-white">
+          <span className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
             {plan.total_optimal.toFixed(2)}€
           </span>
         )}
@@ -61,9 +61,12 @@ export default function ShoppingListCard() {
         </p>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {plan.items.map((item) => (
-          <div key={item.id} className="flex items-center justify-between gap-2">
+          <div
+            key={item.id}
+            className="flex items-center justify-between gap-2 rounded-xl px-1.5 py-1 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60"
+          >
             <div className="flex min-w-0 items-center gap-2">
               <span className="text-base">{item.category_icon}</span>
               <span className="truncate text-sm text-slate-700 dark:text-slate-200">
@@ -88,7 +91,7 @@ export default function ShoppingListCard() {
               )}
               <button
                 onClick={() => handleRemove(item.id)}
-                className="text-slate-300 hover:text-red-500"
+                className="press text-slate-300 transition-colors hover:text-red-500"
                 aria-label="Quitar"
               >
                 ✕
@@ -103,17 +106,17 @@ export default function ShoppingListCard() {
           <button
             onClick={() => setPickerOpen((v) => !v)}
             disabled={adding}
-            className="w-full rounded-xl border border-dashed border-slate-300 py-2 text-xs font-semibold text-slate-500 hover:border-brand-500 hover:text-brand-600 disabled:opacity-50 dark:border-slate-700 dark:text-slate-400"
+            className="press w-full rounded-xl border border-dashed border-slate-300 py-2 text-xs font-semibold text-slate-500 transition-colors hover:border-brand-500 hover:text-brand-600 disabled:opacity-50 dark:border-slate-700 dark:text-slate-400"
           >
             {adding ? "Añadiendo…" : "+ Añadir producto"}
           </button>
           {pickerOpen && (
-            <div className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white p-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+            <div className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-slate-200 bg-white/95 p-1 shadow-xl backdrop-blur-sm dark:border-slate-700 dark:bg-slate-800/95">
               {available.map((c) => (
                 <button
                   key={c.slug}
                   onClick={() => handleAdd(c.slug)}
-                  className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700"
+                  className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
                   <span>{c.icon}</span>
                   {c.label}

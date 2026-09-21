@@ -39,10 +39,10 @@ export default function CompareScreen() {
           <button
             key={c.slug}
             onClick={() => selectCategory(c.slug)}
-            className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold transition-colors ${
+            className={`press flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold transition-all ${
               selectedCategory === c.slug
-                ? "border-brand-700 bg-brand-700 text-white"
-                : "border-slate-200 bg-white text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                ? "border-transparent bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-md shadow-brand-700/25"
+                : "border-slate-200/70 bg-white text-slate-600 shadow-sm dark:border-slate-700/70 dark:bg-slate-900 dark:text-slate-300"
             }`}
           >
             <span>{c.icon}</span>
@@ -82,10 +82,10 @@ export default function CompareScreen() {
             <button
               key={p.product_id}
               onClick={() => setSelectedProduct(p)}
-              className={`flex w-full gap-3 rounded-2xl border p-3 text-left ${
+              className={`press flex w-full gap-3 rounded-2xl border p-3 text-left transition-shadow hover:shadow-md ${
                 idx === 0
-                  ? "border-brand-600 bg-brand-50 dark:bg-brand-950"
-                  : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+                  ? "border-brand-300/70 bg-gradient-to-br from-brand-50 to-white shadow-sm dark:border-brand-700/50 dark:from-brand-950 dark:to-slate-900"
+                  : "border-slate-200/70 bg-white shadow-sm dark:border-slate-800/70 dark:bg-slate-900"
               }`}
             >
               <ProductThumb src={p.image_url} alt={p.name} emoji={comparison.category.icon} className="h-12 w-12" />
@@ -93,7 +93,7 @@ export default function CompareScreen() {
                 <div className="flex flex-wrap items-center gap-1.5">
                   <SupermarketBadge slug={p.supermarket_slug} name={p.supermarket_name} color={p.supermarket_color} emoji={p.supermarket_emoji} />
                   {idx === 0 && (
-                    <span className="rounded-full bg-brand-700 px-2 py-0.5 text-[10px] font-bold text-white">
+                    <span className="rounded-full bg-gradient-to-br from-brand-500 to-brand-700 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
                       MÁS BARATO
                     </span>
                   )}

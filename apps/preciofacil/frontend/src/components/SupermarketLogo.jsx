@@ -9,7 +9,7 @@ export default function SupermarketLogo({ slug, color, emoji, className = "h-8 w
 
   return (
     <span
-      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ${className}`}
+      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-black/5 ${className}`}
       style={!showLogo ? { backgroundColor: color } : undefined}
     >
       {showLogo ? (

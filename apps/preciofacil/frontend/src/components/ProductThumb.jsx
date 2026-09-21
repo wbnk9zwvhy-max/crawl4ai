@@ -6,7 +6,7 @@ export default function ProductThumb({ src, alt, emoji, className = "" }) {
   const showImage = src && !failed;
   return (
     <div
-      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-50 dark:bg-slate-800 ${className}`}
+      className={`flex shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-800/60 ${className}`}
     >
       {showImage ? (
         <img

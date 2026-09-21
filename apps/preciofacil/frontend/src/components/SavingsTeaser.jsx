@@ -20,18 +20,28 @@ export default function SavingsTeaser({ onNavigate }) {
   return (
     <button
       onClick={() => onNavigate?.("insights")}
-      className="mb-5 flex w-full items-center justify-between gap-3 rounded-2xl bg-gradient-to-br from-brand-700 to-brand-500 p-4 text-left text-white"
+      className="press relative mb-5 flex w-full items-center justify-between gap-3 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 via-brand-600 to-brand-800 p-4 text-left text-white shadow-lg shadow-brand-700/25"
     >
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wide text-brand-100">
+      <div
+        className="pointer-events-none absolute -right-6 -top-10 h-32 w-32 rounded-full bg-white/10 blur-xl"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -bottom-8 left-10 h-20 w-20 rounded-full bg-accent-500/20 blur-2xl"
+        aria-hidden="true"
+      />
+      <div className="relative">
+        <p className="text-xs font-semibold uppercase tracking-wider text-brand-100">
           Podrías ahorrar
         </p>
-        <p className="text-2xl font-extrabold">{total.toFixed(2)}€</p>
+        <p className="text-3xl font-extrabold tracking-tight">{total.toFixed(2)}€</p>
         <p className="mt-0.5 text-xs text-brand-100">
           según lo que sueles comprar · toca para ver el detalle
         </p>
       </div>
-      <span className="text-2xl">💡</span>
+      <span className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 text-2xl ring-1 ring-white/25">
+        💡
+      </span>
     </button>
   );
 }

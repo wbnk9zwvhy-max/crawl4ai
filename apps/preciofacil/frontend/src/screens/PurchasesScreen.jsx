@@ -79,13 +79,13 @@ export default function PurchasesScreen() {
 
       <form
         onSubmit={submit}
-        className="mb-6 space-y-3 rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+        className="mb-6 space-y-3 rounded-2xl border border-slate-200/70 bg-white/90 p-4 shadow-sm backdrop-blur-sm dark:border-slate-800/70 dark:bg-slate-900/90"
       >
         <div className="grid grid-cols-2 gap-2">
           <select
             value={form.category_slug}
             onChange={update("category_slug")}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-2 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="rounded-xl border border-slate-200 bg-slate-50 px-2 py-2 text-sm transition-colors focus:border-brand-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
             {categories.map((c) => (
               <option key={c.slug} value={c.slug}>
@@ -96,7 +96,7 @@ export default function PurchasesScreen() {
           <select
             value={form.supermarket_slug}
             onChange={update("supermarket_slug")}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-2 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="rounded-xl border border-slate-200 bg-slate-50 px-2 py-2 text-sm transition-colors focus:border-brand-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           >
             {supermarkets.map((s) => (
               <option key={s.slug} value={s.slug}>
@@ -109,7 +109,7 @@ export default function PurchasesScreen() {
           placeholder="¿Qué compraste? (ej. Fuet Casademont)"
           value={form.product_name}
           onChange={update("product_name")}
-          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+          className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm transition-colors focus:border-brand-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
         />
         <div className="grid grid-cols-2 gap-2">
           <input
@@ -119,19 +119,19 @@ export default function PurchasesScreen() {
             placeholder="Precio (€)"
             value={form.price}
             onChange={update("price")}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm transition-colors focus:border-brand-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
           <input
             type="date"
             value={form.purchased_at}
             onChange={update("purchased_at")}
-            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+            className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm transition-colors focus:border-brand-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
           />
         </div>
         <button
           type="submit"
           disabled={saving}
-          className="w-full rounded-xl bg-brand-700 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+          className="press w-full rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 py-2.5 text-sm font-semibold text-white shadow-md shadow-brand-700/25 disabled:opacity-50"
         >
           {saving ? "Guardando…" : "Registrar compra"}
         </button>
@@ -149,7 +149,7 @@ export default function PurchasesScreen() {
         {purchases.map((p) => (
           <div
             key={p.id}
-            className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900"
+            className="flex items-center justify-between gap-2 rounded-xl border border-slate-200/70 bg-white p-3 shadow-sm dark:border-slate-800/70 dark:bg-slate-900"
           >
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">
@@ -173,7 +173,7 @@ export default function PurchasesScreen() {
               </span>
               <button
                 onClick={() => remove(p.id)}
-                className="text-slate-300 hover:text-red-500"
+                className="press text-slate-300 transition-colors hover:text-red-500"
                 aria-label="Eliminar"
               >
                 ✕

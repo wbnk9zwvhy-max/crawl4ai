@@ -4,7 +4,10 @@ from datetime import datetime
 
 from sqlmodel import Session, select
 
+from scrapers.taxonomy import CATEGORY_BY_SLUG
+
 from .models import Category, PriceSnapshot, Product, Supermarket
+from .product_matching import format_pack, is_plausible_match
 from .schemas import CategoryOut, ProductPriceOut
 
 
@@ -58,6 +61,11 @@ def to_product_price_out(product: Product, snapshot: PriceSnapshot, supermarket:
     # Si no tenemos la URL exacta del producto, al menos enlazamos a la
     # tienda online del supermercado para el botón "Comprar en X".
     buy_url = product.url or supermarket.online_store_url or None
+    pack_label = (
+        format_pack(product.pack_qty, product.pack_unit)
+        if product.pack_qty is not None and product.pack_unit is not None
+        else None
+    )
     return ProductPriceOut(
         product_id=product.id,
         supermarket_slug=supermarket.slug,
@@ -69,6 +77,7 @@ def to_product_price_out(product: Product, snapshot: PriceSnapshot, supermarket:
         image_url=image_url,
         url=buy_url,
         unit=product.unit,
+        pack_label=pack_label,
         price=snapshot.price,
         unit_price=snapshot.unit_price,
         is_offer=snapshot.is_offer,
@@ -115,3 +124,30 @@ def min_price_by_category_and_supermarket(session: Session) -> dict[tuple[str, s
         if key not in best or price < best[key]:
             best[key] = price
     return best
+
+
+def find_similar_products(session: Session, product: Product) -> list[tuple[Product, PriceSnapshot]]:
+    """El mismo tipo de producto y formato (misma categoría + misma
+    cantidad/tamaño de envase, ver app/product_matching.py) en otros
+    supermercados — lo que ve el usuario como "el mismo producto" al abrir
+    la ficha de un producto (p.ej. media docena de huevos)."""
+    if product.pack_qty is None or product.pack_unit is None or product.category_slug is None:
+        return []
+
+    category = CATEGORY_BY_SLUG.get(product.category_slug)
+    search_terms = category.search_terms if category else ()
+
+    pairs = latest_snapshot_per_product(session, category_slug=product.category_slug)
+    best_by_supermarket: dict[str, tuple[Product, PriceSnapshot]] = {}
+    for other, snapshot in pairs:
+        if other.id == product.id or other.supermarket_slug == product.supermarket_slug:
+            continue
+        if other.pack_qty != product.pack_qty or other.pack_unit != product.pack_unit:
+            continue
+        if not is_plausible_match(product.name, other.name, search_terms):
+            continue
+        current = best_by_supermarket.get(other.supermarket_slug)
+        if current is None or snapshot.price < current[1].price:
+            best_by_supermarket[other.supermarket_slug] = (other, snapshot)
+
+    return sorted(best_by_supermarket.values(), key=lambda ps: ps[1].price)

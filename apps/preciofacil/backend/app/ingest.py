@@ -12,6 +12,7 @@ from scrapers.taxonomy import CANONICAL_CATEGORIES
 from .db import engine
 from .media import download_product_images
 from .models import Category, PriceSnapshot, Product, Supermarket
+from .product_matching import resolve_pack_for_item
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +40,9 @@ def sync_static_tables(session: Session) -> None:
 
 
 def _upsert_product(session: Session, item: ScrapedProduct) -> Product:
+    pack = resolve_pack_for_item(item.name, item.unit, item.pack_qty, item.pack_unit)
+    pack_qty, pack_unit = pack if pack else (None, None)
+
     stmt = select(Product).where(
         Product.supermarket_slug == item.supermarket_slug,
         Product.external_id == item.external_id,
@@ -55,6 +59,8 @@ def _upsert_product(session: Session, item: ScrapedProduct) -> Product:
             image_path=item.local_image_path,
             url=item.url,
             unit=item.unit,
+            pack_qty=pack_qty,
+            pack_unit=pack_unit,
         )
         session.add(product)
         session.flush()
@@ -65,6 +71,8 @@ def _upsert_product(session: Session, item: ScrapedProduct) -> Product:
         product.image_path = item.local_image_path or product.image_path
         product.url = item.url or product.url
         product.unit = item.unit or product.unit
+        product.pack_qty = pack_qty if pack_qty is not None else product.pack_qty
+        product.pack_unit = pack_unit if pack_unit is not None else product.pack_unit
     return product
 
 

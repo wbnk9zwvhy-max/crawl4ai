@@ -43,6 +43,11 @@ class Product(SQLModel, table=True):
     image_path: Optional[str] = None
     url: Optional[str] = None
     unit: Optional[str] = None
+    #: cantidad/tamaño de envase normalizado (ver app/product_matching.py),
+    #: usado para reconocer "el mismo producto" en otros supermercados:
+    #: docena de huevos -> (12, "ud"), paquete de pasta 500 g -> (500, "g")...
+    pack_qty: Optional[float] = Field(default=None, index=True)
+    pack_unit: Optional[str] = Field(default=None, index=True)
 
     __table_args__ = ({"sqlite_autoincrement": True},)
 

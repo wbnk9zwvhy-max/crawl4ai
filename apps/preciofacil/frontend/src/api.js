@@ -47,6 +47,7 @@ export const api = {
     request(`/api/insights?user_email=${encodeURIComponent(userEmail)}`),
   scrapeNow: () => request("/api/admin/scrape-now", { method: "POST" }),
   productHistory: (productId) => request(`/api/products/${productId}/history`),
+  similarProducts: (productId) => request(`/api/products/${productId}/similar`),
   shoppingList: (userEmail) =>
     request(`/api/shopping-list?user_email=${encodeURIComponent(userEmail)}`),
   addShoppingListItem: (userEmail, categorySlug) =>

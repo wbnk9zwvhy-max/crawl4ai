@@ -35,6 +35,13 @@ class ScrapedProduct:
     local_image_path: Optional[str] = None
     unit_price: Optional[float] = None
     unit: Optional[str] = None
+    #: cantidad/unidad de envase ("ud"/"g"/"ml") cuando el propio scraper la
+    #: conoce con certeza a partir de datos estructurados (p.ej. Mercadona,
+    #: cuyo nombre de producto no incluye la cantidad). Si se deja en None,
+    #: el pipeline de ingesta intenta extraerla del nombre/unidad (ver
+    #: app/product_matching.py).
+    pack_qty: Optional[float] = None
+    pack_unit: Optional[str] = None
     is_offer: bool = False
     previous_price: Optional[float] = None
     discount_pct: Optional[float] = None

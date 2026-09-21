@@ -35,6 +35,26 @@ logger = logging.getLogger(__name__)
 
 API_BASE = "https://tienda.mercadona.es/api"
 
+#: Mercadona no escribe la cantidad de envase en el nombre del producto
+#: ("Huevos", "Fideo cabello de ángel Hacendado"...), así que la sacamos
+#: directamente de price_instructions: "unit_size" es la cantidad en el
+#: formato "size_format" (p.ej. unit_size=24, size_format="ud" -> docena y
+#: media de huevos = 24 unidades; unit_size=0.5, size_format="kg" -> 500 g).
+_SIZE_FORMAT_TO_PACK_UNIT = {"ud": "ud", "kg": "g", "l": "ml"}
+_SIZE_FORMAT_MULTIPLIER = {"ud": 1, "kg": 1000, "l": 1000}
+
+
+def _pack_qty_from_price_info(price_info: dict) -> float | None:
+    size_format = price_info.get("size_format")
+    unit_size = price_info.get("unit_size")
+    if size_format not in _SIZE_FORMAT_MULTIPLIER or not isinstance(unit_size, (int, float)):
+        return None
+    return round(unit_size * _SIZE_FORMAT_MULTIPLIER[size_format], 2)
+
+
+def _pack_unit_from_price_info(price_info: dict) -> str | None:
+    return _SIZE_FORMAT_TO_PACK_UNIT.get(price_info.get("size_format"))
+
 
 async def resolve_warehouse(postal_code: str) -> str:
     """Resuelve el almacén de Mercadona asociado a un código postal."""
@@ -130,6 +150,8 @@ class MercadonaScraper(BaseSupermarketScraper):
                         image_url=item.get("thumbnail"),
                         unit=price_info.get("size_format"),
                         unit_price=float(price_info["bulk_price"]) if price_info.get("bulk_price") else None,
+                        pack_qty=_pack_qty_from_price_info(price_info),
+                        pack_unit=_pack_unit_from_price_info(price_info),
                         is_offer=is_offer,
                         previous_price=previous_price,
                         discount_pct=self.compute_discount(price, previous_price),

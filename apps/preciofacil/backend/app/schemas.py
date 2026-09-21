@@ -33,6 +33,7 @@ class ProductPriceOut(BaseModel):
     image_url: Optional[str]
     url: Optional[str]
     unit: Optional[str]
+    pack_label: Optional[str]
     price: float
     unit_price: Optional[float]
     is_offer: bool

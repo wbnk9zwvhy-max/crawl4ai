@@ -5,8 +5,13 @@ from sqlmodel import Session, select
 
 from ..db import get_session
 from ..models import Category, PriceSnapshot, Product, Supermarket
-from ..queries import category_out, latest_snapshot_per_product, to_product_price_out
-from ..schemas import CategoryComparisonOut, PriceHistoryPointOut
+from ..queries import (
+    category_out,
+    find_similar_products,
+    latest_snapshot_per_product,
+    to_product_price_out,
+)
+from ..schemas import CategoryComparisonOut, PriceHistoryPointOut, ProductPriceOut
 
 router = APIRouter(prefix="/api/compare", tags=["compare"])
 products_router = APIRouter(prefix="/api/products", tags=["products"])
@@ -24,6 +29,25 @@ def product_price_history(product_id: int, session: Session = Depends(get_sessio
     return [
         PriceHistoryPointOut(scraped_at=s.scraped_at, price=s.price, is_offer=s.is_offer) for s in snapshots
     ]
+
+
+@products_router.get("/{product_id}/similar", response_model=list[ProductPriceOut])
+def product_similar(product_id: int, session: Session = Depends(get_session)):
+    """El mismo producto (misma categoría y formato: docena, 500 g, 1 L...)
+    en otros supermercados, uno por cadena y ordenado de más barato a más
+    caro — para la sección "también lo tienes en" de la ficha de producto."""
+    product = session.get(Product, product_id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+    supermarkets = {s.slug: s for s in session.exec(select(Supermarket)).all()}
+    pairs = find_similar_products(session, product)
+    out = []
+    for other, snapshot in pairs:
+        supermarket = supermarkets.get(other.supermarket_slug)
+        if supermarket:
+            out.append(to_product_price_out(other, snapshot, supermarket))
+    return out
 
 
 @router.get("/{category_slug}", response_model=CategoryComparisonOut)

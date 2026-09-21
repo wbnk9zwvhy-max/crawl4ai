@@ -29,6 +29,18 @@ tostado — así que tras aclararlo se sustituyó por Día y se añadió Kuups.
   botón "Comprar en {supermercado}" que abre la página real de ese
   producto en la tienda online del supermercado (o su web si no hay URL
   exacta) — no hace el pedido por ti, pero te ahorra buscarlo.
+- **Reconocimiento del mismo producto entre supermercados**: al abrir un
+  producto (p.ej. "Huevos grandes L" — media docena — en Mercadona), la
+  ficha muestra automáticamente ese mismo formato en otros supermercados
+  ("También lo tienes en"), con el ahorro si lo hay. No hay EAN homogéneo
+  entre cadenas (y la mayoría de básicos son marca blanca de cada una, así
+  que ni el EAN resolvería "es el mismo producto"), así que se reconoce por
+  categoría + cantidad/formato de envase (docena, media docena, 500 g,
+  1 L...) extraída del nombre o, en Mercadona, de su API — su nombre de
+  producto no incluye la cantidad —, con un filtro para no mezclar
+  productos de tipo distinto (p.ej. "Huevo de Chocolate con Sorpresa" no
+  puede aparecer como equivalente a huevos frescos aunque comparta
+  categoría). Ver `backend/app/product_matching.py`.
 - **Mis compras**: registra lo que compras (producto, supermercado, precio,
   fecha).
 - **Imágenes reales de producto**: cada producto muestra su foto de

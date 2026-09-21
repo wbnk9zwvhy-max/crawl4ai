@@ -14,10 +14,21 @@ tostado — así que tras aclararlo se sustituyó por Día y se añadió Kuups.
 - **Crawl4AI analiza los precios reales cada día a las 8:00** (Europe/Madrid,
   vía APScheduler dentro del backend) y guarda un snapshot histórico de
   precios por producto.
-- **Ofertas de hoy**: las ofertas más destacadas agrupadas por tipo de
-  producto (pasta, leche, fuet, detergente de lavadora, café, huevos...).
+- **Portada (Hoy)**: ofertas destacadas de hoy o de la última semana
+  (selector Hoy / Esta semana), con accesos rápidos por logo a cada
+  supermercado para filtrar solo sus ofertas, un teaser con tu ahorro
+  potencial (enlaza a la pestaña Ahorros) y tu lista de la compra.
+- **Lista de la compra con reparto óptimo**: añade los tipos de producto
+  que sueles comprar (pasta, leche, fuet...) y la app te dice en qué
+  supermercado sale más barato cada uno, el total de repartir la compra
+  entre varios súper y cuánto ahorras frente a comprarlo todo en un único
+  supermercado.
 - **Comparador**: elige un tipo de producto y ve el precio en todos los
-  supermercados, ordenado de más barato a más caro.
+  supermercados, ordenado de más barato a más caro. Al tocar un producto se
+  abre su ficha con histórico de precio (se irá llenando día a día) y un
+  botón "Comprar en {supermercado}" que abre la página real de ese
+  producto en la tienda online del supermercado (o su web si no hay URL
+  exacta) — no hace el pedido por ti, pero te ahorra buscarlo.
 - **Mis compras**: registra lo que compras (producto, supermercado, precio,
   fecha).
 - **Imágenes reales de producto**: cada producto muestra su foto de
@@ -104,3 +115,10 @@ Para forzar un scraping manual (por ejemplo para probar): botón
   alimentación online.
 - Sustituir el `user_email` fijo por autenticación real si la app va a tener
   varios usuarios.
+- Pedido automatizado con carrito real: no implementado a propósito. Cada
+  supermercado tiene su propio checkout/login/pago sin API pública de
+  "añadir al carrito", así que automatizarlo de verdad significa manejar
+  las credenciales y el pago real del usuario en 5-6 flujos distintos —
+  bastante más sensible que leer precios públicos. El botón "Comprar en
+  {súper}" de la ficha de producto es el primer paso razonable: enlaza a la
+  página real del producto en la tienda online correspondiente.

@@ -55,6 +55,9 @@ def to_product_price_out(product: Product, snapshot: PriceSnapshot, supermarket:
     # /media) a enlazar en caliente el CDN del supermercado: es más
     # fiable, más rápida y no depende de que el hotlink siga permitido.
     image_url = f"/media/{product.image_path}" if product.image_path else product.image_url
+    # Si no tenemos la URL exacta del producto, al menos enlazamos a la
+    # tienda online del supermercado para el botón "Comprar en X".
+    buy_url = product.url or supermarket.online_store_url or None
     return ProductPriceOut(
         product_id=product.id,
         supermarket_slug=supermarket.slug,
@@ -64,7 +67,7 @@ def to_product_price_out(product: Product, snapshot: PriceSnapshot, supermarket:
         name=product.name,
         brand=product.brand,
         image_url=image_url,
-        url=product.url,
+        url=buy_url,
         unit=product.unit,
         price=snapshot.price,
         unit_price=snapshot.unit_price,
@@ -77,3 +80,38 @@ def to_product_price_out(product: Product, snapshot: PriceSnapshot, supermarket:
 
 def category_out(category: Category) -> CategoryOut:
     return CategoryOut(slug=category.slug, label=category.label, icon=category.icon)
+
+
+def min_price_by_category_and_supermarket(session: Session) -> dict[tuple[str, str], float]:
+    """Para cada (categoría, supermercado), el precio más bajo entre el
+    último snapshot de cada producto de esa categoría en ese supermercado.
+
+    Usado tanto por el motor de ahorro (insights.py) como por la lista de
+    la compra (shopping_list.py) como aproximación de "mejor precio
+    disponible" para un tipo de producto genérico."""
+    rows = session.exec(
+        select(
+            Product.category_slug,
+            Product.supermarket_slug,
+            Product.id,
+            PriceSnapshot.price,
+            PriceSnapshot.scraped_at,
+        ).join(PriceSnapshot, PriceSnapshot.product_id == Product.id)
+    ).all()
+
+    latest_by_product: dict[int, tuple[float, object]] = {}
+    meta_by_product: dict[int, tuple[str, str]] = {}
+    for category_slug, supermarket_slug, product_id, price, scraped_at in rows:
+        if category_slug is None:
+            continue
+        prev = latest_by_product.get(product_id)
+        if prev is None or scraped_at > prev[1]:
+            latest_by_product[product_id] = (price, scraped_at)
+            meta_by_product[product_id] = (category_slug, supermarket_slug)
+
+    best: dict[tuple[str, str], float] = {}
+    for product_id, (price, _) in latest_by_product.items():
+        key = meta_by_product[product_id]
+        if key not in best or price < best[key]:
+            best[key] = price
+    return best

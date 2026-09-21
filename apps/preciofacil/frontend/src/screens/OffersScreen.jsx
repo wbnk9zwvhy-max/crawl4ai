@@ -4,19 +4,23 @@ import SupermarketBadge from "../components/SupermarketBadge.jsx";
 import SupermarketLogo from "../components/SupermarketLogo.jsx";
 import PriceTag from "../components/PriceTag.jsx";
 import ProductThumb from "../components/ProductThumb.jsx";
+import SavingsTeaser from "../components/SavingsTeaser.jsx";
+import ShoppingListCard from "../components/ShoppingListCard.jsx";
+import ProductDetailSheet from "../components/ProductDetailSheet.jsx";
 
 const PERIODS = [
   { id: "today", label: "Hoy" },
   { id: "week", label: "Esta semana" },
 ];
 
-export default function OffersScreen() {
+export default function OffersScreen({ onNavigate }) {
   const [period, setPeriod] = useState("today");
   const [supermarkets, setSupermarkets] = useState([]);
   const [activeSupermarket, setActiveSupermarket] = useState(null);
   const [groups, setGroups] = useState(null);
   const [error, setError] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     api.supermarkets().then(setSupermarkets).catch(() => {});
@@ -50,6 +54,8 @@ export default function OffersScreen() {
 
   return (
     <div className="px-4 pt-4">
+      <SavingsTeaser onNavigate={onNavigate} />
+
       {/* Selector Hoy / Esta semana */}
       <div className="mb-4 flex items-center justify-between gap-2">
         <div className="flex rounded-full bg-slate-100 p-1 dark:bg-slate-800">
@@ -109,6 +115,8 @@ export default function OffersScreen() {
           ))}
       </div>
 
+      <ShoppingListCard />
+
       <p className="mb-3 text-sm text-slate-500 dark:text-slate-400">
         {period === "today"
           ? "Ofertas destacadas de hoy, agrupadas por producto."
@@ -149,9 +157,10 @@ export default function OffersScreen() {
             </div>
             <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1">
               {group.products.map((p) => (
-                <div
+                <button
                   key={p.product_id}
-                  className="w-44 shrink-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-900"
+                  onClick={() => setSelected({ product: p, categoryIcon: group.category.icon })}
+                  className="w-44 shrink-0 rounded-2xl border border-slate-200 bg-white p-3 text-left shadow-sm dark:border-slate-800 dark:bg-slate-900"
                 >
                   <ProductThumb
                     src={p.image_url}
@@ -172,12 +181,20 @@ export default function OffersScreen() {
                       unitPrice={p.unit_price}
                     />
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </section>
         ))}
       </div>
+
+      {selected && (
+        <ProductDetailSheet
+          product={selected.product}
+          categoryIcon={selected.categoryIcon}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </div>
   );
 }

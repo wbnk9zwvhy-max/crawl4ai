@@ -4,11 +4,26 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
 from ..db import get_session
-from ..models import Category, Supermarket
+from ..models import Category, PriceSnapshot, Product, Supermarket
 from ..queries import category_out, latest_snapshot_per_product, to_product_price_out
-from ..schemas import CategoryComparisonOut
+from ..schemas import CategoryComparisonOut, PriceHistoryPointOut
 
 router = APIRouter(prefix="/api/compare", tags=["compare"])
+products_router = APIRouter(prefix="/api/products", tags=["products"])
+
+
+@products_router.get("/{product_id}/history", response_model=list[PriceHistoryPointOut])
+def product_price_history(product_id: int, session: Session = Depends(get_session)):
+    if session.get(Product, product_id) is None:
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
+    snapshots = session.exec(
+        select(PriceSnapshot)
+        .where(PriceSnapshot.product_id == product_id)
+        .order_by(PriceSnapshot.scraped_at)
+    ).all()
+    return [
+        PriceHistoryPointOut(scraped_at=s.scraped_at, price=s.price, is_offer=s.is_offer) for s in snapshots
+    ]
 
 
 @router.get("/{category_slug}", response_model=CategoryComparisonOut)

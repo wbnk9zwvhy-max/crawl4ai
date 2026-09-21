@@ -50,7 +50,7 @@ export default function App() {
       </header>
 
       <main className="flex-1 pb-24">
-        <Screen />
+        <Screen onNavigate={setTab} />
       </main>
 
       <BottomNav active={tab} onChange={setTab} />

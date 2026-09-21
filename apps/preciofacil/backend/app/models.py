@@ -75,6 +75,17 @@ class Purchase(SQLModel, table=True):
     created_at: datetime = Field(default_factory=utcnow)
 
 
+class ShoppingListItem(SQLModel, table=True):
+    """Un tipo de producto (categoría canónica) que el usuario quiere
+    comprar. La app calcula en qué supermercado sale más barato cada uno y
+    el reparto óptimo de toda la lista (ver app/shopping_list.py)."""
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_email: str = Field(index=True)
+    category_slug: str = Field(foreign_key="category.slug", index=True)
+    created_at: datetime = Field(default_factory=utcnow)
+
+
 class SavingsInsight(SQLModel, table=True):
     """Insight de ahorro generado por el motor de recomendación a partir del
     historial de compras del usuario."""

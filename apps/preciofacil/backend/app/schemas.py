@@ -90,3 +90,36 @@ class SavingsInsightOut(BaseModel):
 
 class ScrapeSummaryOut(BaseModel):
     summary: dict
+
+
+class PriceHistoryPointOut(BaseModel):
+    scraped_at: datetime
+    price: float
+    is_offer: bool
+
+
+class ShoppingListItemIn(BaseModel):
+    user_email: str
+    category_slug: str
+
+
+class ShoppingListItemOut(BaseModel):
+    id: int
+    category_slug: str
+    category_label: str
+    category_icon: str
+    best_supermarket_slug: Optional[str]
+    best_supermarket_name: Optional[str]
+    best_supermarket_color: Optional[str]
+    best_supermarket_emoji: Optional[str]
+    best_price: Optional[float]
+
+
+class ShoppingListPlanOut(BaseModel):
+    items: list[ShoppingListItemOut]
+    total_optimal: float
+    single_stop_supermarket_slug: Optional[str]
+    single_stop_supermarket_name: Optional[str]
+    single_stop_total: Optional[float]
+    savings_amount: Optional[float]
+    savings_pct: Optional[float]

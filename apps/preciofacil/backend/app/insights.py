@@ -17,41 +17,11 @@ from __future__ import annotations
 
 from sqlmodel import Session, select
 
-from .models import Category, PriceSnapshot, Product, Purchase, SavingsInsight, Supermarket
+from .models import Category, Purchase, SavingsInsight, Supermarket
+from .queries import min_price_by_category_and_supermarket
 
 MIN_SAVINGS_EUR = 0.05
 MIN_SAVINGS_PCT = 3.0
-
-
-def _latest_min_price_by_category_and_supermarket(session: Session) -> dict[tuple[str, str], float]:
-    """Para cada (categoria, supermercado) devuelve el precio más bajo entre
-    el último snapshot de cada producto de esa categoría en ese supermercado."""
-    rows = session.exec(
-        select(
-            Product.category_slug,
-            Product.supermarket_slug,
-            Product.id,
-            PriceSnapshot.price,
-            PriceSnapshot.scraped_at,
-        ).join(PriceSnapshot, PriceSnapshot.product_id == Product.id)
-    ).all()
-
-    latest_by_product: dict[int, tuple[float, object]] = {}
-    meta_by_product: dict[int, tuple[str, str]] = {}
-    for category_slug, supermarket_slug, product_id, price, scraped_at in rows:
-        if category_slug is None:
-            continue
-        prev = latest_by_product.get(product_id)
-        if prev is None or scraped_at > prev[1]:
-            latest_by_product[product_id] = (price, scraped_at)
-            meta_by_product[product_id] = (category_slug, supermarket_slug)
-
-    best: dict[tuple[str, str], float] = {}
-    for product_id, (price, _) in latest_by_product.items():
-        key = meta_by_product[product_id]
-        if key not in best or price < best[key]:
-            best[key] = price
-    return best
 
 
 def recompute_insights_for_user(session: Session, user_email: str) -> list[SavingsInsight]:
@@ -69,7 +39,7 @@ def recompute_insights_for_user(session: Session, user_email: str) -> list[Savin
     if not purchases:
         return []
 
-    best_price_by_key = _latest_min_price_by_category_and_supermarket(session)
+    best_price_by_key = min_price_by_category_and_supermarket(session)
     categories = {c.slug: c for c in session.exec(select(Category)).all()}
     supermarkets = {s.slug: s for s in session.exec(select(Supermarket)).all()}
 

@@ -11,7 +11,7 @@ from sqlmodel import Session
 from .db import engine, init_db
 from .ingest import run_daily_scrape, sync_static_tables
 from .media import MEDIA_DIR
-from .routers import categories, insights, offers, products, purchases, supermarkets
+from .routers import categories, insights, offers, products, purchases, shopping_list, supermarkets
 from .scheduler import start_scheduler
 
 logging.basicConfig(level=logging.INFO)
@@ -40,9 +40,11 @@ app.mount("/media", StaticFiles(directory=str(MEDIA_DIR)), name="media")
 app.include_router(supermarkets.router)
 app.include_router(categories.router)
 app.include_router(products.router)
+app.include_router(products.products_router)
 app.include_router(offers.router)
 app.include_router(purchases.router)
 app.include_router(insights.router)
+app.include_router(shopping_list.router)
 
 
 @app.get("/api/health")

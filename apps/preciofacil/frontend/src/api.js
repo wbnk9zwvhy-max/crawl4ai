@@ -46,4 +46,16 @@ export const api = {
   insights: (userEmail) =>
     request(`/api/insights?user_email=${encodeURIComponent(userEmail)}`),
   scrapeNow: () => request("/api/admin/scrape-now", { method: "POST" }),
+  productHistory: (productId) => request(`/api/products/${productId}/history`),
+  shoppingList: (userEmail) =>
+    request(`/api/shopping-list?user_email=${encodeURIComponent(userEmail)}`),
+  addShoppingListItem: (userEmail, categorySlug) =>
+    request("/api/shopping-list", {
+      method: "POST",
+      body: JSON.stringify({ user_email: userEmail, category_slug: categorySlug }),
+    }),
+  removeShoppingListItem: (id, userEmail) =>
+    request(`/api/shopping-list/${id}?user_email=${encodeURIComponent(userEmail)}`, {
+      method: "DELETE",
+    }),
 };

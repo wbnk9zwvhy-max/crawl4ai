@@ -3,20 +3,22 @@ import { api } from "../api.js";
 import SupermarketBadge from "../components/SupermarketBadge.jsx";
 import PriceTag from "../components/PriceTag.jsx";
 import ProductThumb from "../components/ProductThumb.jsx";
+import ProductDetailSheet from "../components/ProductDetailSheet.jsx";
 
 export default function CompareScreen() {
   const [categories, setCategories] = useState([]);
-  const [selected, setSelected] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [comparison, setComparison] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     api.categories().then(setCategories).catch((err) => setError(err.message));
   }, []);
 
   const selectCategory = (slug) => {
-    setSelected(slug);
+    setSelectedCategory(slug);
     setLoading(true);
     setError(null);
     api
@@ -38,7 +40,7 @@ export default function CompareScreen() {
             key={c.slug}
             onClick={() => selectCategory(c.slug)}
             className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold transition-colors ${
-              selected === c.slug
+              selectedCategory === c.slug
                 ? "border-brand-700 bg-brand-700 text-white"
                 : "border-slate-200 bg-white text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
             }`}
@@ -55,7 +57,7 @@ export default function CompareScreen() {
         </div>
       )}
 
-      {!selected && (
+      {!selectedCategory && (
         <div className="mt-10 text-center text-sm text-slate-400">
           Prueba con "pasta", "leche", "fuet y embutido" o "detergente de lavadora" 👆
         </div>
@@ -77,9 +79,10 @@ export default function CompareScreen() {
             </p>
           )}
           {comparison.products.map((p, idx) => (
-            <div
+            <button
               key={p.product_id}
-              className={`flex gap-3 rounded-2xl border p-3 ${
+              onClick={() => setSelectedProduct(p)}
+              className={`flex w-full gap-3 rounded-2xl border p-3 text-left ${
                 idx === 0
                   ? "border-brand-600 bg-brand-50 dark:bg-brand-950"
                   : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
@@ -106,9 +109,17 @@ export default function CompareScreen() {
                   />
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
+      )}
+
+      {selectedProduct && (
+        <ProductDetailSheet
+          product={selectedProduct}
+          categoryIcon={comparison?.category?.icon}
+          onClose={() => setSelectedProduct(null)}
+        />
       )}
     </div>
   );
